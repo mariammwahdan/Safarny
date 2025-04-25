@@ -1,1 +1,23 @@
-<p>navbar works!</p>
+<nav class="navbar fixed-top bg-primary ">
+    <div class="container-md d-flex justify-content-between align-items-center">
+      <a class="navbar-brand text-primary fw-bold text-lg text-white fst-italic" routerLink="/">Safarny</a>
+  
+      <div class="d-flex justify-content-center flex-grow-1">
+        <a class="nav-link px-3 btn cursor-pointer fs-5  text-white" routerLink="/home">Home</a>
+        <a class="nav-link px-3 btn cursor-pointer fs-5  text-white" routerLink="/trips">Trips</a>
+        <a class="nav-link px-3 btn cursor-pointer fs-5  text-white" routerLink="/about">About Us</a>
+        <a class="nav-link px-3 btn cursor-pointer fs-5  text-white" routerLink="/contact">Contact Us</a>
+      </div>
+  
+      <div class="d-flex align-items-center">
+        <a class="nav-link me-3 btn cursor-pointer fs-5  text-white" routerLink="/login">Login</a>
+        <a class="nav-link me-3 btn cursor-pointer fs-5  text-white" routerLink="/signup">Signup</a>
+        <a class="nav-link btn cursor-pointer  text-white"   routerLink="/profile">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+              </svg>
+        </a>
+      </div>
+    </div>
+  </nav>
+  
