@@ -1,0 +1,12 @@
+::ng-deep .mat-icon.text-sky-50 {
+  color: rgb(240, 249, 255) !important; /* sky-50 color value */
+}
+
+::ng-deep .mat-icon.text-white {
+  color: white !important;
+}
+
+::ng-deep .mat-flat-button.navbar-button {
+  background-color: rgb(240, 249, 255) !important; /* sky-50 color value */
+  color: rgb(37, 99, 235) !important; /* blue-600 color value */
+}

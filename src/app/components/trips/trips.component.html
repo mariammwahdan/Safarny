@@ -1,0 +1,151 @@
+< class="relative">
+
+    <img src="trips.jpg" alt="Trips" class="w-full h-[500px] object-cover">
+
+
+    <div class="absolute left-1/2 transform -translate-x-1/2 top-2/4 w-11/12 md:w-2/3">
+        <mat-card class="p-2" style="background-color: #e8f1ff; border-radius: 12px;">
+            <form [formGroup]="tripForm" class="grid grid-cols-5 gap-4 items-center p-4">
+                <div class="col-span-5
+                    flex justify-center items-center">
+                    <mat-radio-group formControlName="tripType" class="flex space-x-4">
+                        <mat-radio-button value="one-way">One Way</mat-radio-button>
+                        <mat-radio-button value="round-trip">Round Trip</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-span-2">
+                    <label class="block font-semibold mb-1">Starting point:</label>
+                    <mat-form-field appearance="outline" class="w-full">
+                        <mat-select formControlName="source" placeholder="Choose your gov">
+                            <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="w-full">
+                        <mat-label>Departure Date</mat-label>
+                        <input matInput [matDatepicker]="picker" formControlName="depatureDate">
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <div class="flex justify-center items-center text-3xl col-span-1">
+                    <ng-container *ngIf="tripForm.get('tripType')?.value === 'round-trip'; else oneWayIcon">
+                        <mat-icon class="text-blue-700">swap_horiz</mat-icon>
+                    </ng-container>
+                    <ng-template #oneWayIcon>
+                        <mat-icon class="text-blue-700">arrow_forward</mat-icon>
+                    </ng-template>
+                </div>
+                <div class="col-span-2">
+                    <label class="block font-semibold mb-1">Destination:</label>
+                    <mat-form-field appearance="fill" class="w-full">
+                        <mat-label>Choose your gov</mat-label>
+                        <mat-select formControlName="destination">
+                            <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="fill"
+                        class="w-full">
+                        <mat-label>Return Date</mat-label>
+                        <input matInput [matDatepicker]="picker2" formControlName="returnDate">
+                        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                        <mat-datepicker #picker2></mat-datepicker>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-span-5 flex justify-center">
+                    <button mat-raised-button color="primary" type="button" (click)="searchTrips()"
+                        class="px-8 py-3 w-68">
+                        Search
+                    </button>
+                </div>
+            </form>
+        </mat-card>
+    </div>
+
+    <div class="h-[200px]"></div>
+
+    <div *ngIf="availableTrips.length > 0" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
+
+
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Available trips</h2>
+            <div>
+                <mat-form-field appearance="outline" class="w-48">
+                    <mat-select placeholder="Filter">
+                        <mat-option value="all">All</mat-option>
+                        <mat-option value="flight">Flight</mat-option>
+                        <mat-option value="train">Train</mat-option>
+                        <mat-option value="bus">Bus</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <mat-card *ngFor="let trip of availableTrips"
+                class="p-6 rounded-lg bg-white border border-gray-200 shadow-md">
+
+
+                <div class="flex items-center justify-between">
+
+                    <div class="flex-1">
+                        <div class="flex justify-start text-xs text-gray-500 uppercase">
+                            <span>{{ trip.source }}</span>
+                            <span class="mx-2 w-54"></span>
+                            <span>{{ trip.destination }}</span>
+                        </div>
+
+                        <div class="flex items-center justify-start mt-2">
+
+                            <div class="text-xl font-bold">
+                                {{ trip.departureTime }}
+                            </div>
+
+
+                            <div class="flex items-center mx-4">
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                <span class="w-16 h-px bg-gray-400"></span>
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                <span class="text-gray-400 text-xl mx-2">
+                                    <ng-container [ngSwitch]="trip.transportationType.toLowerCase()">
+                                        <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
+                                        <mat-icon *ngSwitchCase="'train'">train</mat-icon>
+                                        <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
+                                        <mat-icon *ngSwitchDefault>commute</mat-icon>
+                                    </ng-container>
+                                </span>
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                                <span class="w-16 h-px bg-gray-400"></span>
+                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            </div>
+
+
+                            <div class="text-xl font-bold">
+                                {{ trip.arrivalTime }}
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="flex items-center space-x-8 px-6">
+                        <div class="text-center">
+                            <div class="text-sm text-gray-500">Guest</div>
+                            <div class="text-lg font-bold">{{ trip.price }} EGP</div>
+                        </div>
+
+                        <div class="text-center capitalize">
+                            <div class="text-sm text-gray-500">Transportation</div>
+                            <div class="text-lg font-semibold">{{ trip.transportationType }}</div>
+                        </div>
+
+                        <button mat-raised-button color="primary" class="px-6 ml-4">
+                            Book ticket
+                        </button>
+                    </div>
+                </div>
+            </mat-card>
+        </div>
+    </div>
