@@ -1,0 +1,211 @@
+<app-modal [show]="show" (close)="onClose()">
+  <div
+    class="flex flex-col items-center justify-center space-y-4 w-full max-w-md p-8 rounded-2xl"
+  >
+    <h1 class="text-3xl font-bold mb-4">Sign Up</h1>
+
+    <form
+      [formGroup]="signupForm"
+      (ngSubmit)="submitForm()"
+      class="w-full space-y-4"
+    >
+      <!-- Account Info -->
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-gray-600"
+          >Account Information</span
+        >
+        <div
+          *ngIf="submitted && signupForm.get('email')?.invalid"
+          class="text-red-500 text-sm"
+        >
+          <div *ngIf="signupForm.get('email')?.errors?.['required']">
+            Email is required.
+          </div>
+          <div *ngIf="signupForm.get('email')?.errors?.['email']">
+            Email format is invalid.
+          </div>
+        </div>
+        <input
+          formControlName="email"
+          type="email"
+          placeholder="Email"
+          class="p-3 rounded-full bg-blue-50 w-full"
+          required
+        />
+        <div
+          *ngIf="submitted && signupForm.get('password')?.invalid"
+          class="text-red-500 text-sm"
+        >
+          <div *ngIf="signupForm.get('password')?.errors?.['required']">
+            Password is required.
+          </div>
+          <div *ngIf="signupForm.get('password')?.errors?.['pattern']">
+            Password must be 8-12 characters, include uppercase, lowercase,
+            number, and special character.
+          </div>
+        </div>
+        <input
+          formControlName="password"
+          type="password"
+          placeholder="Password"
+          class="p-3 rounded-full bg-blue-50 w-full"
+        />
+        <div
+          *ngIf="submitted && signupForm.get('confirmPassword')?.invalid"
+          class="text-red-500 text-sm"
+        >
+          <div *ngIf="signupForm.get('confirmPassword')?.errors?.['required']">
+            Confirm Password is required.
+          </div>
+        </div>
+
+        <div
+          *ngIf="submitted && signupForm.hasError('mismatch')"
+          class="text-red-500 text-sm"
+        >
+          Passwords do not match.
+        </div>
+        <input
+          formControlName="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          class="p-3 rounded-full bg-blue-50 w-full"
+        />
+      </div>
+
+      <!-- Basic Info -->
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-gray-600">Basic Info</span>
+
+        <div class="flex gap-2">
+          <!-- 🛠 Wrap each input+error in its own flex-col, width 1/2 -->
+          <div class="flex flex-col w-1/2">
+            <div *ngIf="submitted && signupForm.get('firstName')?.invalid" class="text-red-500 text-sm">
+              <div *ngIf="signupForm.get('firstName')?.errors?.['required']">
+                Required.
+              </div>
+            </div>
+            <input
+              formControlName="firstName"
+              type="text"
+              placeholder="First Name"
+              class="p-3 rounded-full bg-blue-50 w-full"
+            />
+          </div>
+
+          <div class="flex flex-col w-1/2">
+            <div *ngIf="submitted && signupForm.get('lastName')?.invalid" class="text-red-500 text-sm">
+              <div *ngIf="signupForm.get('lastName')?.errors?.['required']">
+                Required.
+              </div>
+            </div>
+            <input
+              formControlName="lastName"
+              type="text"
+              placeholder="Last Name"
+              class="p-3 rounded-full bg-blue-50 w-full"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        *ngIf="submitted && signupForm.get('phone')?.invalid"
+        class="text-red-500 text-sm"
+      >
+        <div *ngIf="signupForm.get('phone')?.errors?.['required']">
+          Phone number is required.
+        </div>
+        <div *ngIf="signupForm.get('phone')?.errors?.['pattern']">
+          Phone number is invalid format.
+        </div>
+        <div *ngIf="signupForm.get('phone')?.errors?.['minlength']">
+          Phone number is too short.
+        </div>
+        <div *ngIf="signupForm.get('phone')?.errors?.['maxlength']">
+          Phone number is too long.
+        </div>
+      </div>
+      <input
+        formControlName="phone"
+        type="tel"
+        placeholder="Number"
+        class="p-3 rounded-full bg-blue-50 w-full"
+      />
+
+      <!-- Gender -->
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-gray-600">Gender</span>
+        <div class="flex gap-4 justify-center">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              formControlName="gender"
+              value="Male"
+              class="hidden peer"
+            />
+            <span
+              class="text-gray-600 px-4 py-2 rounded-full peer-checked:bg-blue-600 peer-checked:text-white transition bg-blue-50"
+              >Male</span
+            >
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              formControlName="gender"
+              value="Female"
+              class="hidden peer"
+            />
+            <span
+              class="text-gray-600 px-4 py-2 rounded-full peer-checked:bg-pink-500 peer-checked:text-white transition bg-pink-50"
+              >Female</span
+            >
+          </label>
+        </div>
+      </div>
+
+      <!-- Birthdate -->
+      <div class="flex flex-col gap-2">
+        <span class="text-sm font-semibold text-gray-600">Date of Birth</span>
+        <div class="flex gap-2">
+          <input
+            formControlName="day"
+            type="number"
+            placeholder="Day"
+            class="p-3 rounded-full bg-blue-50 w-1/3"
+          />
+          <input
+            formControlName="month"
+            type="number"
+            placeholder="Month"
+            class="p-3 rounded-full bg-blue-50 w-1/3"
+          />
+          <input
+            formControlName="year"
+            type="number"
+            placeholder="Year"
+            class="p-3 rounded-full bg-blue-50 w-1/3"
+          />
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="submit"
+          class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 rounded-full w-full cursor-pointer"
+        >
+          Register
+        </button>
+        <button
+
+          type="button"
+          (click)="onClose()"
+          class="text-blue-600 hover:underline text-sm cursor-pointer"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>

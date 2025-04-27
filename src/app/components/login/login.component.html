@@ -1,0 +1,68 @@
+<app-modal [show]="show" (close)="onClose()">
+  <div
+    class="flex flex-col items-center justify-center space-y-4 w-full max-w-md p-8 rounded-2xl"
+  >
+    <h1 class="text-3xl font-bold mb-4">Log In</h1>
+
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="submitForm()"
+      class="w-full space-y-4"
+    >
+      <div
+        *ngIf="submitted && loginForm.get('email')?.errors?.['required']"
+        class="text-red-500 text-sm"
+      >
+        Email is required.
+      </div>
+      <input
+        formControlName="email"
+        type="email"
+        placeholder="Email"
+        class="p-3 rounded-full border bg-blue-50 w-full"
+      />
+      <div
+        *ngIf="submitted && loginForm.get('password')?.errors?.['required']"
+        class="text-red-500 text-sm"
+      >
+        Password is required.
+      </div>
+      <input
+        formControlName="password"
+        type="password"
+        placeholder="Password"
+        class="p-3 rounded-full border bg-blue-50 w-full"
+      />
+
+      <!-- Forgot Password -->
+      <div class="text-right text-sm">
+        <a href="#" class="text-blue-600 hover:underline">Forgot Password?</a>
+      </div>
+
+      <!-- Not registered -->
+      <div class="text-center text-sm text-gray-600">
+        Not registered?
+        <a href="#" class="text-blue-600 font-semibold hover:underline"
+          >Sign Up</a
+        >
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex flex-col gap-2 pt-2">
+        <button
+          type="submit"
+          class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 rounded-full w-full cursor-pointer"
+        >
+          Log In
+        </button>
+        <button
+          type="button"
+          (click)="onClose()"
+          class="text-blue-600 hover:underline text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</app-modal>
