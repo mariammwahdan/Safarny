@@ -6,11 +6,12 @@ import {
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ModalComponent, ReactiveFormsModule, CommonModule],
+  imports: [ModalComponent, ReactiveFormsModule, CommonModule, MatButtonModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })
