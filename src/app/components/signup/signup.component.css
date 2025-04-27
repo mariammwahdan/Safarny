@@ -1,0 +1,29 @@
+.custom-datepicker-form-field {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Customize the outline itself */
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  border-radius: 16px;
+}
+
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-start,
+::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline-end {
+  border-radius: 16px;
+}
+
+.custom-datepicker-input {
+  padding: 12px;
+  border-radius: 16px;
+}
+
+/* Nice focus blue color */
+::ng-deep
+  .mat-form-field-appearance-outline.mat-focused
+  .mat-form-field-outline-thick {
+  border-color: #3b82f6; /* blue */
+}
+::ng-deep .mat-datepicker-toggle-default-icon {
+  font-size: 20px;
+}

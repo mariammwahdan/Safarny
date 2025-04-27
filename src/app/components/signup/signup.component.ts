@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 interface User {
   firstname: string;
   lastname: string;
@@ -37,6 +38,7 @@ interface User {
     MatFormFieldModule,
     MatInputModule,
     MatNativeDateModule,
+    MatButtonModule,
   ],
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css'],
