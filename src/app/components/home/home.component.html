@@ -1,26 +1,152 @@
-<section class="bg-blue-700 py-44">
+
+<!-- <section class="bg-blue-700 py-44">
     <div class=" px-4 p-4 md:px-10 lg:px-32 md:flex md:justify-between md:items-center">
       <div class="flex flex-col md:flex-row md:items-center">
         
         <div class="md:w-1/2 mb-8 md:mb-0 md:mt-12">
-          <h3 class="text-blue-200 mb-3 text-2xl">Explore your Travel</h3>
+          <h3 class="text-white mb-3 text-2xl">Explore your Travel</h3>
           <h1 class="text-white font-bold text-4xl mb-4">Trusted Travel Agency.</h1>
-          <p class="text-white">
+          <p class="text-white ">
             I travel not to go anywhere but to go.
             I travel for travel’s sake.
             The great affair is to move.
           </p>
+          <button
+          class="
+            flex
+            items-center
+            px-4
+            py-2
+            mt-5
+            italic
+            text-white
+            filter
+            drop-shadow-md
+            rounded-full
+            shadow-lg
+            bg-blue-600
+            hover:bg-blue-700
+            transition
+          "
+        >
+          Explore Trips
+        </button>
+        
         </div>
         
         <div class="md:w-1/2 flex md:flex md:px-60 justify-center md:justify-end">
           <img
-            src="assets/rectangle-1.png"
+            src="pngwing 2.svg"
             alt="Travel illustration"
-            class="rounded-lg max-w-full "
+            class="w-full h-64 "
           >
         </div>
         
       </div>
     </div>
-  </section>
-  
+  </section> -->
+
+  <section 
+  class="relative py-44 bg-cover bg-center "
+  style="background-image:url('plane2.jpg');"
+>
+  <div
+    class="px-4 p-4 md:px-10 lg:px-32
+           flex flex-col items-center text-center"
+  >
+    <h3 class="text-white mb-3 text-2xl">
+      Explore your Travel
+    </h3>
+    <h1 class="text-white font-bold text-4xl mb-4">
+      Trusted Travel Agency.
+    </h1>
+    <p class="text-white mb-5">
+      I travel not to go anywhere but to go.
+      I travel for travel's sake.
+      The great affair is to move.
+    </p>
+    <button
+      class="flex items-center text-2xl px-8 py-2 italic text-white
+             filter drop-shadow-md rounded-full shadow-lg
+             bg-blue-800 hover:bg-blue-700 transition"
+    >
+      Explore Trips
+    </button>
+  </div>
+</section>
+
+
+<section class="py-9">
+  <div class="px-4 md:px-10 lg:px-32"  >
+    <h2
+      
+      class="text-4xl font-bold text-center py-16"
+    >
+      Explore Egypt
+    </h2>
+
+    <owl-carousel-o
+      [options]="customOptions"
+      class="cursor-pointer"
+    >
+      <ng-container *ngFor="let slide of slides">
+        <ng-template carouselSlide>
+          <img
+            [src]="slide.img"
+            [alt]="slide.caption"
+            class="w-full h-64 object-cover rounded-4xl mb-4 shadow-lg"
+          />
+          <div class="text-center text-lg py-2">
+            {{ slide.caption }}
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
+  </div>
+</section>
+
+
+
+ <section 
+  class="relative py-20 bg-cover bg-center"
+  style="background-image: url('train1.jpg')"
+>
+ <div class="px-4 p-4 md:px-10 lg:px-32" >
+
+ 
+  <div class="absolute inset-0 bg-black/40"></div>
+
+  <div
+    class="relative z-10 px-4 md:px-10 lg:px-32
+           flex flex-col items-center text-center text-white"
+  >
+    <h2 class="text-4xl font-bold pb-10">
+      Why Choose us ?
+    </h2>
+
+    <div
+      class="flex flex-col md:flex-row justify-center
+             items-start space-y-6  md:space-y-0 md:space-x-12"
+    >
+
+      <div class="flex items-start space-x-3 max-w-xs">
+        <img src="price.svg" class="w-6 h-6 mt-1" alt="" />
+        <p class="text-md">Best Price Guarantee</p>
+      </div>
+
+      <div class="flex items-start space-x-3 max-w-xs">
+        <img src="des.svg" class="w-6 h-6 mt-1" alt="" />
+        <p class="text-md">Global Destinations</p>
+      </div>
+
+      <div class="flex items-start space-x-3 max-w-xs">
+        <img src="cservice.svg" class="w-6 h-6 mt-1" alt="" />
+        <p class="text-md">24/7 Customer Support</p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+
+
