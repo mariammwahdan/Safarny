@@ -15,15 +15,15 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block font-semibold mb-1">Starting point:</label>
-                    <mat-form-field appearance="outline" class="w-full">
+                    <mat-form-field appearance="outline" class="w-full custom-form-field">
                         <mat-select formControlName="source" placeholder="Choose your gov">
                             <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
                         </mat-select>
                     </mat-form-field>
 
-                    <mat-form-field appearance="fill" class="w-full">
-                        <mat-label>Departure Date</mat-label>
-                        <input matInput [matDatepicker]="picker" formControlName="depatureDate">
+                    <mat-form-field appearance="outline" class="w-full custom-form-field">
+                        <input matInput [matDatepicker]="picker" formControlName="depatureDate"
+                            placeholder="Departure Date">
                         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
@@ -39,17 +39,16 @@
                 </div>
                 <div class="col-span-2">
                     <label class="block font-semibold mb-1">Destination:</label>
-                    <mat-form-field appearance="fill" class="w-full">
-                        <mat-label>Choose your gov</mat-label>
-                        <mat-select formControlName="destination">
+                    <mat-form-field appearance="outline" class="w-full custom-form-field">
+                        <mat-select formControlName="destination" placeholder="Choose your gov">
                             <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
                         </mat-select>
                     </mat-form-field>
 
-                    <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="fill"
-                        class="w-full">
-                        <mat-label>Return Date</mat-label>
-                        <input matInput [matDatepicker]="picker2" formControlName="returnDate">
+                    <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="outline"
+                        class="w-full custom-form-field">
+                        <input matInput [matDatepicker]="picker2" formControlName="returnDate"
+                            placeholder="Return Date">
                         <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                         <mat-datepicker #picker2></mat-datepicker>
                     </mat-form-field>
@@ -67,14 +66,12 @@
 
     <div class="h-[200px]"></div>
 
-    <div *ngIf="availableTrips.length > 0" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
-
-
+    <div *ngIf="filteredTrips.length > 0 && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3" #resultsSection>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Available trips</h2>
             <div>
                 <mat-form-field appearance="outline" class="w-48">
-                    <mat-select placeholder="Filter">
+                    <mat-select placeholder="Filter by transportation" [(ngModel)]="selectedTransportation">
                         <mat-option value="all">All</mat-option>
                         <mat-option value="flight">Flight</mat-option>
                         <mat-option value="train">Train</mat-option>
@@ -85,7 +82,7 @@
         </div>
 
         <div class="space-y-6">
-            <mat-card *ngFor="let trip of availableTrips"
+            <mat-card *ngFor="let trip of filteredTrips"
                 class="p-6 rounded-lg bg-white border border-gray-200 shadow-md">
 
 
@@ -141,11 +138,18 @@
                             <div class="text-lg font-semibold">{{ trip.transportationType }}</div>
                         </div>
 
-                        <button mat-raised-button color="primary" class="px-6 ml-4">
+                        <button mat-raised-button color="primary" class="px-6 ml-4" (click)="bookTrip(trip)">
                             Book ticket
                         </button>
                     </div>
                 </div>
             </mat-card>
         </div>
+    </div>
+    <div *ngIf="isLoadingTrips" class="flex justify-center items-center h-screen">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div *ngIf="filteredTrips.length === 0 && searchPerformed && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
+        <h2 class="text-2xl font-bold text-center" >No trips found</h2>
+        <p class="text-gray-500 text-center">Please adjust your search criteria.</p>
     </div>

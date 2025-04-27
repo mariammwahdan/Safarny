@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -13,27 +13,9 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { Trip } from '../../types/trips';
 
-interface TripSearchRequest {
-  tripType: string;
-  source: string;
-  destination: string;
-  departureDate: string;
-  returnDate?: string;
-  numberOfPassengers: number;
-}
-
-interface Trip {
-  id: number;
-  source: string;
-  destination: string;
-  departureDate: string;
-  departureTime: string;
-  arrivalTime: string;
-  duration: string;
-  transportationType: string;
-  price: number;
-}
 
 @Component({
   selector: 'app-trips',
@@ -52,12 +34,17 @@ interface Trip {
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
+    FormsModule,
+    MatProgressSpinnerModule,
   ],
   templateUrl: './trips.component.html',
   styleUrl: './trips.component.css',
 })
 export class TripsComponent implements OnInit {
-  trips: Trip[] = [];
+  @ViewChild('resultsSection') resultsSection!: ElementRef;
+
+  selectedTransportation: string = 'all';
+
   locations: string[] = [
     'Cairo',
     'Alexandria',
@@ -68,6 +55,7 @@ export class TripsComponent implements OnInit {
   ];
 
   tripForm!: FormGroup;
+searchPerformed: any;
 
   constructor(private fb: FormBuilder) {}
 
@@ -85,7 +73,6 @@ export class TripsComponent implements OnInit {
       numberOfPassengers: [1, [Validators.required, Validators.min(1)]],
     });
 
-    // If round trip is selected, make return date required
     this.tripForm.get('tripType')?.valueChanges.subscribe((tripType) => {
       const returnDateControl = this.tripForm.get('returnDate');
       if (tripType === 'round-trip') {
@@ -97,18 +84,17 @@ export class TripsComponent implements OnInit {
     });
   }
 
-
   bookTrip(trip: Trip) {
     console.log('Booking trip:', trip);
   }
 
-  availableTrips: any[] = []; 
+  availableTrips: Trip[] = [];
   isLoadingTrips: boolean = false;
 
   searchTrips() {
     this.isLoadingTrips = true;
+    this.searchPerformed = true;
 
-    
     setTimeout(() => {
       this.availableTrips = [
         {
@@ -126,15 +112,40 @@ export class TripsComponent implements OnInit {
           id: 2,
           source: this.tripForm.value.source,
           destination: this.tripForm.value.destination,
-          depatureDate: this.tripForm.value.depatureDate,
+          departureDate: this.tripForm.value.depatureDate,
           departureTime: '3:00 PM',
           arrivalTime: '5:00 PM',
           duration: '2h',
           transportationType: 'Train',
           price: 50,
         },
-      ]
+      ];
       this.isLoadingTrips = false;
+
+      // Scroll to the results section after a short delay
+      setTimeout(() => {
+        this.scrollToResults();
+      }, 100);
     }, 1500);
+  }
+
+  scrollToResults() {
+    if (this.availableTrips.length > 0 && this.resultsSection) {
+      this.resultsSection.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
+  }
+
+  get filteredTrips(): Trip[] {
+    if (!this.availableTrips) return [];
+    if (this.selectedTransportation === 'all') return this.availableTrips;
+
+    return this.availableTrips.filter(
+      (trip) =>
+        trip.transportationType.toLowerCase() ===
+        this.selectedTransportation.toLowerCase()
+    );
   }
 }
