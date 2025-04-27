@@ -52,6 +52,7 @@ export class TripsComponent implements OnInit {
   @ViewChild('resultsSection') resultsSection!: ElementRef;
 
   selectedTransportation: string = 'all';
+  minDate: Date = new Date(); 
 
   cities: City[] = [];
   loadingCities = false;
@@ -103,7 +104,7 @@ export class TripsComponent implements OnInit {
       tripType: ['one-way', Validators.required],
       source: ['', Validators.required],
       destination: ['', Validators.required],
-      depatureDate: ['', Validators.required],
+      departureDate: ['', Validators.required],
       returnDate: [''],
       numberOfPassengers: [1, [Validators.required, Validators.min(1)]],
     });
@@ -148,7 +149,7 @@ export class TripsComponent implements OnInit {
           id: 2,
           source: this.tripForm.value.source,
           destination: this.tripForm.value.destination,
-          departureDate: this.tripForm.value.depatureDate,
+          departureDate: this.tripForm.value.departureDate,
           departureTime: '3:00 PM',
           arrivalTime: '5:00 PM',
           duration: '2h',

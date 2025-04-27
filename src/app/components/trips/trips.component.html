@@ -21,7 +21,7 @@
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
-                    <input matInput [matDatepicker]="picker" formControlName="depatureDate"
+                    <input matInput [matDatepicker]="picker" formControlName="departureDate" [min]="minDate"
                         placeholder="Departure Date">
                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
@@ -50,7 +50,8 @@
 
                 <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="outline"
                     class="w-full custom-form-field compact-form-field">
-                    <input matInput [matDatepicker]="picker2" formControlName="returnDate" placeholder="Return Date">
+                    <input matInput [matDatepicker]="picker2" formControlName="returnDate" placeholder="Return Date "
+                        [min]="tripForm.get('departureDate')?.value || minDate">
                     <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
                     <mat-datepicker #picker2></mat-datepicker>
                 </mat-form-field>
