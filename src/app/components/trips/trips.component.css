@@ -1,17 +1,87 @@
-.full-width-header {
-  width: 100%;
-  margin: 0;
-  padding: 0;
+/* Custom form field styling - Improved visibility */
+.custom-form-field {
+  --mdc-outlined-text-field-container-color: white;
+  --mdc-outlined-text-field-outline-color: rgba(30, 64, 175, 0.5);
+  --mdc-outlined-text-field-focus-outline-color: rgba(30, 64, 175, 0.9);
+  --mdc-outlined-text-field-hover-outline-color: rgba(30, 64, 175, 0.7);
+  --mdc-outlined-text-field-label-text-color: rgba(30, 64, 175, 0.8);
+  --mat-form-field-label-text-color: rgba(30, 64, 175, 0.8);
 }
 
-.full-width-header h3 {
-  width: 100%;
-  text-align: center;
+/* Ensure text input is visible */
+::ng-deep .custom-form-field input,
+::ng-deep .custom-form-field .mat-mdc-select-value-text {
+  color: #000000 !important;
+  font-weight: 500;
 }
 
+/* Ensure placeholder is more visible */
+::ng-deep .custom-form-field ::placeholder {
+  color: rgba(30, 64, 175, 0.6) !important;
+  opacity: 1;
+}
 
-::ng-deep .mat-grid-tile .mat-grid-tile-header {
-  width: 100%;
-  left: 0;
-  right: 0;
+/* Make dropdown options more visible */
+::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+  color: #000000 !important;
+  font-weight: 500;
+}
+
+/* Compact form field styling to reduce height */
+.compact-form-field {
+  --mdc-outlined-text-field-top-space: 8px;
+  --mdc-outlined-text-field-bottom-space: 8px;
+  --mdc-outlined-text-field-leading-space: 12px;
+  --mdc-outlined-text-field-trailing-space: 12px;
+  margin-bottom: 0;
+}
+
+/* Make form field font size smaller for a more compact look */
+::ng-deep
+  .compact-form-field
+  .mat-mdc-text-field-wrapper
+  .mat-mdc-form-field-flex
+  .mat-mdc-floating-label,
+::ng-deep .compact-form-field .mat-mdc-text-field-wrapper input,
+::ng-deep .compact-form-field .mat-mdc-select-value {
+  font-size: 14px;
+}
+
+/* Reduce the height of select dropdowns */
+::ng-deep .compact-form-field .mat-mdc-select {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* Custom styling for mat-radio-buttons */
+::ng-deep .mat-mdc-radio-button.mat-accent {
+  --mdc-radio-selected-focus-icon-color: #1e40af;
+  --mdc-radio-selected-hover-icon-color: #1e40af;
+  --mdc-radio-selected-icon-color: #1e40af;
+  --mdc-radio-selected-pressed-icon-color: #1e40af;
+  transform: scale(0.9);
+}
+
+/* Card styling with smooth transition */
+mat-card {
+  transition: all 0.3s ease;
+}
+
+mat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Styling for the date picker icons */
+::ng-deep .mat-datepicker-toggle {
+  color: #3b82f6;
+  transform: scale(0.85);
+}
+
+/* Enhancing the icon in the middle of the form */
+.rounded-full mat-icon {
+  font-size: 24px;
+  height: 24px;
+  width: 24px;
 }

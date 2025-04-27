@@ -4,7 +4,6 @@ export interface TripSearchRequest {
   destination: string;
   departureDate: string;
   returnDate?: string;
-  numberOfPassengers: number;
 }
 
 export interface Trip {

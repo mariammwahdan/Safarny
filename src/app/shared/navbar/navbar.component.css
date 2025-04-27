@@ -14,3 +14,21 @@
   background-color: rgb(240, 249, 255) !important; /* sky-50 color value */
   color: rgb(37, 99, 235) !important; /* blue-600 color value */
 }
+
+/* Transparent navbar styling */
+nav {
+  transition: background-color 0.3s ease;
+  /* Removed box-shadow property */
+}
+
+/* Enhance text visibility even when navbar is transparent */
+nav a,
+nav button {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+nav a:hover,
+nav button:hover {
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
