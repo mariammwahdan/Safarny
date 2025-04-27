@@ -6,7 +6,7 @@ import {
   Inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
@@ -61,7 +61,8 @@ export class TripsComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private countryService: CountryService
+    private countryService: CountryService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -85,7 +86,6 @@ export class TripsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading cities:', error);
-          // Fallback to default cities if API fails
           this.cities = [
             { name: 'Cairo', value: 'Cairo' },
             { name: 'Alexandria', value: 'Alexandria' },
@@ -120,7 +120,7 @@ export class TripsComponent implements OnInit {
   }
 
   bookTrip(trip: Trip) {
-    console.log('Booking trip:', trip);
+    this.router.navigate(['/booking', trip.id]);
   }
 
   availableTrips: Trip[] = [];
@@ -129,7 +129,7 @@ export class TripsComponent implements OnInit {
   searchTrips() {
     this.isLoadingTrips = true;
     this.searchPerformed = true;
-    this.selectedTransportation = 'all'; // Reset filter to 'all' when searching
+    this.selectedTransportation = 'all';
 
     setTimeout(() => {
       this.availableTrips = [
