@@ -1,35 +1,35 @@
-< class="relative">
-
-    <img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
+<img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
 
 
-    <div class="absolute left-1/2 transform -translate-x-1/2 top-2/4 w-11/12 md:w-2/3">
-        <mat-card class="p-2" style="background-color: #e8f1ff; border-radius: 12px;">
-            <form [formGroup]="tripForm" class="grid grid-cols-5 gap-4 items-center p-4">
-                <div class="col-span-5
-                    flex justify-center items-center">
-                    <mat-radio-group formControlName="tripType" class="flex space-x-4">
-                        <mat-radio-button value="one-way">One Way</mat-radio-button>
-                        <mat-radio-button value="round-trip">Round Trip</mat-radio-button>
-                    </mat-radio-group>
-                </div>
-                <div class="col-span-2">
-                    <label class="block font-semibold mb-1">Starting point:</label>
-                    <mat-form-field appearance="outline" class="w-full custom-form-field">
-                        <mat-select formControlName="source" placeholder="Choose your gov">
-                            <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+<div class="absolute left-1/2 transform -translate-x-1/2 top-2/5 w-11/12 md:w-3/4 lg:w-2/3">
+    <mat-card class="p-4 shadow-lg bg-white bg-opacity-95 backdrop-blur-sm rounded-xl border border-gray-100">
+        <form [formGroup]="tripForm" class="grid grid-cols-5 gap-3 items-center p-2">
+            <div class="col-span-5 flex justify-center items-center mb-1">
+                <mat-radio-group formControlName="tripType" class="flex space-x-6">
+                    <mat-radio-button value="one-way" class="text-blue-800">One Way</mat-radio-button>
+                    <mat-radio-button value="round-trip" class="text-blue-800">Round Trip</mat-radio-button>
+                </mat-radio-group>
+            </div>
 
-                    <mat-form-field appearance="outline" class="w-full custom-form-field">
-                        <input matInput [matDatepicker]="picker" formControlName="depatureDate"
-                            placeholder="Departure Date">
-                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-datepicker #picker></mat-datepicker>
-                    </mat-form-field>
-                </div>
+            <div class="col-span-2 space-y-2">
+                <label class="block font-semibold text-sm text-blue-900">Starting point:</label>
+                <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
+                    <mat-select formControlName="source" placeholder="Choose your starting location">
+                        <mat-option *ngIf="loadingCities" disabled>Loading cities...</mat-option>
+                        <mat-option *ngFor="let city of cities" [value]="city.value">{{ city.name }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
 
-                <div class="flex justify-center items-center text-3xl col-span-1">
+                <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
+                    <input matInput [matDatepicker]="picker" formControlName="depatureDate"
+                        placeholder="Departure Date">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            <div class="flex justify-center items-center text-2xl col-span-1">
+                <div class="bg-blue-100 p-2 rounded-full">
                     <ng-container *ngIf="tripForm.get('tripType')?.value === 'round-trip'; else oneWayIcon">
                         <mat-icon class="text-blue-700">swap_horiz</mat-icon>
                     </ng-container>
@@ -37,120 +37,125 @@
                         <mat-icon class="text-blue-700">arrow_forward</mat-icon>
                     </ng-template>
                 </div>
-                <div class="col-span-2">
-                    <label class="block font-semibold mb-1">Destination:</label>
-                    <mat-form-field appearance="outline" class="w-full custom-form-field">
-                        <mat-select formControlName="destination" placeholder="Choose your gov">
-                            <mat-option *ngFor="let city of locations" [value]="city">{{ city }}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+            </div>
 
-                    <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="outline"
-                        class="w-full custom-form-field">
-                        <input matInput [matDatepicker]="picker2" formControlName="returnDate"
-                            placeholder="Return Date">
-                        <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
-                        <mat-datepicker #picker2></mat-datepicker>
-                    </mat-form-field>
-                </div>
-
-                <div class="col-span-5 flex justify-center">
-                    <button mat-raised-button color="primary" type="button" (click)="searchTrips()"
-                        class="px-8 py-3 w-68">
-                        Search
-                    </button>
-                </div>
-            </form>
-        </mat-card>
-    </div>
-
-    <div class="h-1/4" style="min-height: 250px; max-height: 300px;"></div>
-
-    <div *ngIf="filteredTrips.length > 0 && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3" #resultsSection>
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Available trips</h2>
-            <div>
-                <mat-label class="text-sm font-medium mr-2 inline-block py-2">Filter by Transportation:</mat-label>
-                <mat-form-field appearance="outline" class="w-48">
-                    <mat-select  [(ngModel)]="selectedTransportation">
-                        <mat-option value="all">All</mat-option>
-                        <mat-option value="flight">Flight</mat-option>
-                        <mat-option value="train">Train</mat-option>
-                        <mat-option value="bus">Bus</mat-option>
+            <div class="col-span-2 space-y-2">
+                <label class="block font-semibold text-sm text-blue-900">Destination:</label>
+                <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
+                    <mat-select formControlName="destination" placeholder="Choose your destination">
+                        <mat-option *ngIf="loadingCities" disabled>Loading cities...</mat-option>
+                        <mat-option *ngFor="let city of cities" [value]="city.value">{{ city.name }}</mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <mat-form-field *ngIf="tripForm.get('tripType')?.value === 'round-trip'" appearance="outline"
+                    class="w-full custom-form-field compact-form-field">
+                    <input matInput [matDatepicker]="picker2" formControlName="returnDate" placeholder="Return Date">
+                    <mat-datepicker-toggle matIconSuffix [for]="picker2"></mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
             </div>
+
+            <div class="col-span-5 flex justify-center mt-2">
+                <button mat-flat-button color="primary" type="button" (click)="searchTrips()"
+                    [disabled]="!tripForm.valid"
+                    class="px-8 py-2 w-auto rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md"
+                    [ngClass]="{'bg-gray-400 hover:bg-gray-400 cursor-not-allowed': !tripForm.valid}">
+                    <mat-icon class="mr-2">search</mat-icon> Search Trips
+                </button>
+            </div>
+        </form>
+    </mat-card>
+</div>
+
+<div class="h-1/4" style="min-height: 200px; max-height: 300px;"></div>
+
+<div *ngIf="filteredTrips.length > 0 && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3"
+    #resultsSection>
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Available trips</h2>
+        <div>
+            <mat-label class="text-sm font-medium mr-2 inline-block py-2">Filter by Transportation:</mat-label>
+            <mat-form-field appearance="outline" class="w-48">
+                <mat-select [(ngModel)]="selectedTransportation">
+                    <mat-option value="all">All</mat-option>
+                    <mat-option value="flight">Flight</mat-option>
+                    <mat-option value="train">Train</mat-option>
+                    <mat-option value="bus">Bus</mat-option>
+                </mat-select>
+            </mat-form-field>
         </div>
+    </div>
 
-        <div class="space-y-6">
-            <mat-card *ngFor="let trip of filteredTrips"
-                class="p-6 rounded-lg bg-white border border-gray-200 shadow-md">
-
-
-                <div class="flex items-center justify-between">
-
-                    <div class="flex-1">
-                        <div class="flex justify-start text-xs text-gray-500 uppercase">
-                            <span>{{ trip.source }}</span>
-                            <span class="mx-2 w-54"></span>
-                            <span>{{ trip.destination }}</span>
-                        </div>
-
-                        <div class="flex items-center justify-start mt-2">
-
-                            <div class="text-xl font-bold">
-                                {{ trip.departureTime }}
-                            </div>
+    <div class="space-y-6">
+        <mat-card *ngFor="let trip of filteredTrips" class="p-6 rounded-lg bg-white border border-gray-200 shadow-md">
 
 
-                            <div class="flex items-center mx-4">
-                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                <span class="w-16 h-px bg-gray-400"></span>
-                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                <span class="text-gray-400 text-xl mx-2">
-                                    <ng-container [ngSwitch]="trip.transportationType.toLowerCase()">
-                                        <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
-                                        <mat-icon *ngSwitchCase="'train'">train</mat-icon>
-                                        <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
-                                        <mat-icon *ngSwitchDefault>commute</mat-icon>
-                                    </ng-container>
-                                </span>
-                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                                <span class="w-16 h-px bg-gray-400"></span>
-                                <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            </div>
+            <div class="flex items-center justify-between">
 
-
-                            <div class="text-xl font-bold">
-                                {{ trip.arrivalTime }}
-                            </div>
-                        </div>
+                <div class="flex-1">
+                    <div class="flex justify-start text-xs text-gray-500 uppercase">
+                        <span>{{ trip.source }}</span>
+                        <span class="mx-2 w-54"></span>
+                        <span>{{ trip.destination }}</span>
                     </div>
 
+                    <div class="flex items-center justify-start mt-2">
 
-                    <div class="flex items-center space-x-8 px-6">
-                        <div class="text-center">
-                            <div class="text-sm text-gray-500">Guest</div>
-                            <div class="text-lg font-bold">{{ trip.price }} EGP</div>
+                        <div class="text-xl font-bold">
+                            {{ trip.departureTime }}
                         </div>
 
-                        <div class="text-center capitalize">
-                            <div class="text-sm text-gray-500">Transportation</div>
-                            <div class="text-lg font-semibold">{{ trip.transportationType }}</div>
+
+                        <div class="flex items-center mx-4">
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            <span class="w-16 h-px bg-gray-400"></span>
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            <span class="text-gray-400 text-xl mx-2">
+                                <ng-container [ngSwitch]="trip.transportationType.toLowerCase()">
+                                    <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
+                                    <mat-icon *ngSwitchCase="'train'">train</mat-icon>
+                                    <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
+                                    <mat-icon *ngSwitchDefault>commute</mat-icon>
+                                </ng-container>
+                            </span>
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            <span class="w-16 h-px bg-gray-400"></span>
+                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                         </div>
 
-                        <button mat-raised-button color="primary" class="px-6 ml-4" (click)="bookTrip(trip)">
-                            Book ticket
-                        </button>
+
+                        <div class="text-xl font-bold">
+                            {{ trip.arrivalTime }}
+                        </div>
                     </div>
                 </div>
-            </mat-card>
-        </div>
+
+
+                <div class="flex items-center space-x-8 px-6">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-500">Guest</div>
+                        <div class="text-lg font-bold">{{ trip.price }} EGP</div>
+                    </div>
+
+                    <div class="text-center capitalize">
+                        <div class="text-sm text-gray-500">Transportation</div>
+                        <div class="text-lg font-semibold">{{ trip.transportationType }}</div>
+                    </div>
+
+                    <button mat-flat-button color="primary" class="px-6 ml-4" (click)="bookTrip(trip)">
+                        Book ticket
+                    </button>
+                </div>
+            </div>
+        </mat-card>
     </div>
-    <div *ngIf="isLoadingTrips" class="flex justify-center items-center h-screen">
-        <mat-spinner></mat-spinner>
-    </div>
-    <div *ngIf="filteredTrips.length === 0 && searchPerformed && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
-        <h2 class="text-2xl font-bold text-center" >No trips found</h2>
-        <p class="text-gray-500 text-center">Please adjust your search criteria.</p>
-    </div>
+</div>
+<div *ngIf="isLoadingTrips" class="flex justify-center items-center h-screen">
+    <mat-spinner></mat-spinner>
+</div>
+<div *ngIf="filteredTrips.length === 0 && searchPerformed && !isLoadingTrips"
+    class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
+    <h2 class="text-2xl font-bold text-center">No trips found</h2>
+    <p class="text-gray-500 text-center">Please adjust your search criteria.</p>
+</div>

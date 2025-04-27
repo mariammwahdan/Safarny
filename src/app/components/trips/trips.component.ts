@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ViewChild,
+  ElementRef,
+  Inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatGridListModule } from '@angular/material/grid-list';
@@ -13,9 +19,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
-
+import { CountryService } from '../../core/services/country.service';
+import { City } from '../../types/city';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-trips',
@@ -45,22 +53,49 @@ export class TripsComponent implements OnInit {
 
   selectedTransportation: string = 'all';
 
-  locations: string[] = [
-    'Cairo',
-    'Alexandria',
-    'Luxor',
-    'Aswan',
-    'Sharm El Sheikh',
-    'Hurghada',
-  ];
+  cities: City[] = [];
+  loadingCities = false;
 
   tripForm!: FormGroup;
-searchPerformed: any;
+  searchPerformed: boolean = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private countryService: CountryService
+  ) {}
 
   ngOnInit() {
     this.initForm();
+    this.loadCities('Egypt');
+  }
+
+  loadCities(country: string) {
+    this.loadingCities = true;
+    this.countryService
+      .getAllCitiesWithCountry(country)
+      .pipe(finalize(() => (this.loadingCities = false)))
+      .subscribe({
+        next: (response) => {
+          const cityNames = response.data;
+
+          this.cities = cityNames.map((city) => ({
+            name: city,
+            value: city,
+          }));
+        },
+        error: (error) => {
+          console.error('Error loading cities:', error);
+          // Fallback to default cities if API fails
+          this.cities = [
+            { name: 'Cairo', value: 'Cairo' },
+            { name: 'Alexandria', value: 'Alexandria' },
+            { name: 'Luxor', value: 'Luxor' },
+            { name: 'Aswan', value: 'Aswan' },
+            { name: 'Sharm El Sheikh', value: 'Sharm El Sheikh' },
+            { name: 'Hurghada', value: 'Hurghada' },
+          ];
+        },
+      });
   }
 
   initForm() {
@@ -94,6 +129,7 @@ searchPerformed: any;
   searchTrips() {
     this.isLoadingTrips = true;
     this.searchPerformed = true;
+    this.selectedTransportation = 'all'; // Reset filter to 'all' when searching
 
     setTimeout(() => {
       this.availableTrips = [
@@ -122,7 +158,6 @@ searchPerformed: any;
       ];
       this.isLoadingTrips = false;
 
-      // Scroll to the results section after a short delay
       setTimeout(() => {
         this.scrollToResults();
       }, 100);
