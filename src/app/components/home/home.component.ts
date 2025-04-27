@@ -4,6 +4,9 @@ import { CommonModule } from '@angular/common'
 import { MatIconModule } from '@angular/material/icon'
 import { MatButtonModule } from '@angular/material/button'
 import {MatDividerModule} from '@angular/material/divider';
+import { CarouselModule } from 'ngx-owl-carousel-o'
+import { OwlOptions } from 'ngx-owl-carousel-o'
+
 
 
 
@@ -15,7 +18,10 @@ import {MatDividerModule} from '@angular/material/divider';
     SlickCarouselModule,
     MatIconModule,
     MatButtonModule,
-    MatDividerModule
+    MatDividerModule,
+    CarouselModule
+    
+   
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -31,35 +37,25 @@ export class HomeComponent {
     { img: "luxor.jpg", caption: "Luxor Temple" },
     { img: "sharm.jpg", caption: "Sharm El Sheikh" },
     { img: "Alex.jpg", caption: "Alex" },
-    { img: "Aswan.jpg", caption: "Nile River" },
+    { img: "Aswan.jpg", caption: "Aswan" },
+    { img: "Hurgada.jpg", caption: "Hurgada" },
 
   ];
 
-  slideConfig = {
-    slidesToShow: 4,
-    slidesToScroll: 3,
-    dots: true,          
-    infinite: true,
+  
+  customOptions: OwlOptions = {
+    loop: true,
     autoplay: true,
-    draggable: true,
-  touchMove: true,
-    responsive: [
-      {
-        breakpoint: 1024, 
-        settings: {
-          slidesToShow: 4,
-          slidesToScroll: 1
-        }
-      },
-      {
-        breakpoint: 768, 
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1
-        }
-      }
-    ]
-  };
+    autoplayTimeout: 3000,
+    dots: true,
+    nav: false,
+    margin: 10,
+    responsive: {
+      0:    { items: 1 },
+      640:  { items: 2 },
+      1024: { items: 4 }
+    }
+  }
 
   @HostListener('window:scroll', [])
   onWindowScroll() {

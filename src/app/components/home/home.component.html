@@ -62,7 +62,7 @@
     </h1>
     <p class="text-white mb-5">
       I travel not to go anywhere but to go.
-      I travel for travel’s sake.
+      I travel for travel's sake.
       The great affair is to move.
     </p>
     <button
@@ -75,21 +75,39 @@
   </div>
 </section>
 
- <section class="py-9">
-  <div class=" px-4 p-4 md:px-10 lg:px-32" data-aos="fade-up" data-aos-duration="1000">
-    <h2 class="text-4xl font-bold text-center mb-10">Explore Egypt</h2>
-  <ngx-slick-carousel class="carousel" [config]="slideConfig" class="cursor-pointer" >
-  <div  ngxSlickItem *ngFor="let slide of slides" class="slide">
-    <img [src]="slide.img" alt="{{slide.caption}}" class="w-full h-64 object-cover rounded-4xl mb-4 px-2">
-    <div class="caption text-center text-lg py-2">{{slide.caption}}</div>
+
+<section class="py-9">
+  <div class="px-4 md:px-10 lg:px-32"  >
+    <h2
+      
+      class="text-4xl font-bold text-center py-16"
+    >
+      Explore Egypt
+    </h2>
+
+    <owl-carousel-o
+      [options]="customOptions"
+      class="cursor-pointer"
+    >
+      <ng-container *ngFor="let slide of slides">
+        <ng-template carouselSlide>
+          <img
+            [src]="slide.img"
+            [alt]="slide.caption"
+            class="w-full h-64 object-cover rounded-4xl mb-4 shadow-lg"
+          />
+          <div class="text-center text-lg py-2">
+            {{ slide.caption }}
+          </div>
+        </ng-template>
+      </ng-container>
+    </owl-carousel-o>
   </div>
-</ngx-slick-carousel>
+</section>
 
-  </div>
 
- </section>
 
- <section data-aos="fade-up" data-aos-duration="1000"
+ <section 
   class="relative py-20 bg-cover bg-center"
   style="background-image: url('train1.jpg')"
 >
