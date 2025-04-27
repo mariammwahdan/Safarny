@@ -1,6 +1,6 @@
 < class="relative">
 
-    <img src="trips.jpg" alt="Trips" class="w-full h-[500px] object-cover">
+    <img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
 
 
     <div class="absolute left-1/2 transform -translate-x-1/2 top-2/4 w-11/12 md:w-2/3">
@@ -64,14 +64,15 @@
         </mat-card>
     </div>
 
-    <div class="h-[200px]"></div>
+    <div class="h-1/4" style="min-height: 250px; max-height: 300px;"></div>
 
     <div *ngIf="filteredTrips.length > 0 && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3" #resultsSection>
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold">Available trips</h2>
             <div>
+                <mat-label class="text-sm font-medium mr-2 inline-block py-2">Filter by Transportation:</mat-label>
                 <mat-form-field appearance="outline" class="w-48">
-                    <mat-select placeholder="Filter by transportation" [(ngModel)]="selectedTransportation">
+                    <mat-select  [(ngModel)]="selectedTransportation">
                         <mat-option value="all">All</mat-option>
                         <mat-option value="flight">Flight</mat-option>
                         <mat-option value="train">Train</mat-option>
