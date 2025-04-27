@@ -11,8 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
   standalone: true,
   imports: [CommonModule, RouterLink, MatIconModule, MatButtonModule,LoginComponent, SignupComponent],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css',
-  styleUrl: './navbar.component.css',
+  styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent {
   isLoggedIn = false;
