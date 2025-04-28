@@ -1,0 +1,72 @@
+<div class="profile-wrapper">
+  <div>
+    <h2 class="profile">Profile</h2>
+    <p>View & Update Your Personal and Contact Information</p>
+  </div>
+
+  <div class="card">
+    <h2 class="section-title">Contact Information</h2>
+    <div class="form-grid">
+      <div class="field-wrapper">
+        <label>Email</label>
+        <div class="input-wrapper">
+          <input type="email" [(ngModel)]="email" />
+        </div>
+      </div>
+
+      <div class="field-wrapper">
+        <label>Phone Number</label>
+        <div class="input-wrapper">
+          <input type="text" [(ngModel)]="phone" />
+        </div>
+        </div>
+    </div>
+  </div>
+
+  <!-- Personal Information -->
+  <div class="card">
+    <h2 class="section-title">Personal Information</h2>
+    <div class="form-grid">
+      <div class="field-wrapper">
+        <label>First Name</label>
+        <div class="input-wrapper">
+          <input type="text" [(ngModel)]="firstName"  />
+
+        </div>
+      </div>
+
+      <div class="field-wrapper">
+        <label>Last Name</label>
+        <div class="input-wrapper">
+          <input type="text" [(ngModel)]="lastName"  />
+
+        </div>
+      </div>
+
+      <div class="field-wrapper full-width">
+        <label>Nationality</label>
+        <select [(ngModel)]="nationality">
+          <option value="">Select Nationality</option>
+          <option value="Egyptian">Egyptian</option>
+          <option value="Saudi">Saudi</option>
+          <option value="Emirati">Emirati</option>
+          <option value="Jordanian">Jordanian</option>
+          <!-- more options -->
+        </select>
+      </div>
+
+      <div class="field-wrapper full-width">
+        <label>Birthday</label>
+        <div class="input-wrapper">
+          <input type="date" [(ngModel)]="birthday" />
+        </div>
+        <p>This cannot be changed later.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="update-btn-wrapper">
+    <button [disabled]="!isChanged" class="update-btn">Update Profile</button>
+  </div>
+</div>

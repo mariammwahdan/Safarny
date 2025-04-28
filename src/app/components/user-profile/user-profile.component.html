@@ -1,0 +1,26 @@
+<mat-drawer-container class="drawer-container">
+  <mat-drawer mode="side" opened class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="logo">Safarny</h2>
+    </div>
+
+    <ul class="menu">
+      <li class="active">User Profile</li>
+      <li>Orders</li>
+      <li>Subscriptions</li>
+      <li>Address</li>
+      <li>Payments</li>
+      <li>Wishlist</li>
+    </ul>
+
+    <div class="sign-out">
+      <a href="#">Sign out</a>
+    </div>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <div class="profile-content">
+      <app-personal-details></app-personal-details>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
