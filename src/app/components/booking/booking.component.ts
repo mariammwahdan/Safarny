@@ -19,15 +19,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
-import { CountryService } from '../../core/services/country.service'; // Optional if you need services
-import { finalize } from 'rxjs/operators';
+
 
 @Component({
   selector: 'app-booking',
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
+    // RouterLink,
     MatCardModule,
     MatRadioModule,
     ReactiveFormsModule,
@@ -113,30 +112,53 @@ export class BookingComponent implements OnInit {
   }
 
   // check selected extras
-  checkSelectedExtras(extra: string) {
-    if (extra=== 'Meal') {
-      return 50;
-    
-    } else if (extra === 'First Class Upgrade') {
-      return 100;
-    
-    } else if (extra === 'Extra Luggage') {
-      return 150;
+  checkSelectedExtras(extras: string[]): number {
+    let total = 0;
+    for (const extra of extras) {
+      if (extra === 'Meal') {
+        total += 50;
+      }
+      else if (extra === 'First Class Upgrade') {
+        total += 100;
+      }
+      else if (extra === 'Extra Luggage') {
+        total += 150;
+      }
+      else if (extra === 'WiFi') {
+        total += 20;
+      }
+      else if (extra === 'AC') {
+        total += 30;
+      }
+      else if (extra === 'Extra Legroom') {
+        total += 40;
+      }
+      else if (extra === 'Insurance') {
+        total += 60;
+      }
+      else if (extra === 'Priority Boarding') {
+        total += 80;
+      }
+      else {
+        total += 50; // Default price for any other extra
+      }
     }
-    else {
-      return 50;
-    }
+    return total;
+
   }
     
 
   updateTotalPrice() {
     const seats = this.tripForm.get('numberOfSeats')?.value || 1;
-    const extrasCount = (this.tripForm.get('selectedExtras')?.value || []).length;
+    // const extrasCount = (this.tripForm.get('selectedExtras')?.value || []).length;
     const basePrice = this.tripData.price;
-    this.totalPrice = (basePrice * seats) + (extrasCount * 50); // Assume 50 EGP per extra option
+
+    let extrasPrice = this.checkSelectedExtras(this.tripForm.get('selectedExtras')?.value || []);
+
+    this.totalPrice = (basePrice * seats) + (extrasPrice);
   }
 
-  bookTrip() {
+  proceedToPayment() {
     console.log('Booking confirmed with details:', this.tripForm.value);
     alert('Booking confirmed! 🎉');
   }
