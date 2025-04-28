@@ -121,7 +121,8 @@ export class TripsComponent implements OnInit {
   }
 
   bookTrip(trip: Trip) {
-    this.router.navigate(['/booking', trip.id]);
+    console.log('Booking trip:', trip);
+    this.router.navigate(['/booking', trip.id], { state: { trip: trip } });
   }
 
   availableTrips: Trip[] = [];

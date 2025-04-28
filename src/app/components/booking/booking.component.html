@@ -1,1 +1,94 @@
-<p>booking works!</p>
+<img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
+
+<div class="absolute left-1/2 transform -translate-x-1/2 top-2/5 w-11/12 md:w-3/4 lg:w-2/3">
+  <mat-card class="p-6 shadow-lg bg-white bg-opacity-95 backdrop-blur-sm rounded-xl border border-gray-100">
+    <div class="flex flex-col items-center">
+      <h1 class="text-2xl font-bold mb-4">Trip Details</h1>
+
+      <!-- Existing trip info (FROM, TO, Departure/Arrival) -->
+      <div class="flex flex-col md:flex-row justify-between w-full mb-6">
+        <div class="flex-1 mb-4 md:mb-0">
+          <div class="text-sm text-gray-500 uppercase">From</div>
+          <div class="text-xl font-bold">{{ tripData.source }}</div>
+        </div>
+
+        <div class="flex items-center justify-center">
+          <div class="flex items-center">
+            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <div class="w-16 h-px bg-gray-400"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <span class="mx-2 text-gray-400 text-2xl">
+              <ng-container [ngSwitch]="tripData.transportationType.toLowerCase()">
+                <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
+                <mat-icon *ngSwitchCase="'train'">train</mat-icon>
+                <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
+                <mat-icon *ngSwitchDefault>commute</mat-icon>
+              </ng-container>
+            </span>
+            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+            <div class="w-16 h-px bg-gray-400"></div>
+            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+          </div>
+        </div>
+
+        <div class="flex-1 text-right">
+          <div class="text-sm text-gray-500 uppercase">To</div>
+          <div class="text-xl font-bold">{{ tripData.destination }}</div>
+        </div>
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-around w-full text-center mb-6">
+        <div>
+          <div class="text-gray-500 text-sm mb-1">Departure Time</div>
+          <div class="text-lg font-semibold">{{ tripData.departureTime }}</div>
+        </div>
+
+        <div>
+          <div class="text-gray-500 text-sm mb-1">Arrival Time</div>
+          <div class="text-lg font-semibold">{{ tripData.arrivalTime }}</div>
+        </div>
+
+        <div>
+          <div class="text-gray-500 text-sm mb-1">Base Price</div>
+          <div class="text-lg font-bold">{{ tripData.price }} EGP</div>
+        </div>
+      </div>
+
+      <!-- Booking Form -->
+      <form [formGroup]="tripForm" class="w-full space-y-4">
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Number of Seats</mat-label>
+          <input matInput type="number" formControlName="numberOfSeats" min="1">
+        </mat-form-field>
+
+        <mat-form-field appearance="fill" class="w-full">
+          <mat-label>Extras</mat-label>
+          <mat-select formControlName="selectedExtras" multiple>
+            <mat-option *ngFor="let extra of extrasOptions" [value]="extra">
+              {{ extra }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div class="text-lg font-bold mt-4">
+          Total Price: {{ totalPrice }} EGP
+        </div>
+
+        <div class="mt-6 text-center">
+          <button mat-flat-button color="primary" class="px-8 py-2 rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md"
+            [disabled]="!tripForm.valid"
+            (click)="bookTrip()">
+            Confirm Booking
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </mat-card>
+</div>
+
+<div class="h-1/4" style="min-height: 200px; max-height: 300px;"></div>
+<div class="h-1/4" style="min-height: 200px; max-height: 300px;"></div>
+<div class="h-1/4" style="min-height: 200px; max-height: 300px;"></div>
