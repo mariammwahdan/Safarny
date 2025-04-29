@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { User } from '../../types/user';
 
 @Injectable({
   providedIn: 'root',
@@ -33,5 +34,16 @@ export class AuthService {
 
   isLoggedIn(): Observable<boolean> {
     return this.isAuthenticated.asObservable();
+  }
+  getUserData(): User {
+    return {
+      firstname: 'Mariam',
+      lastname: 'Wahdan',
+      phone: '01066498636',
+      email: 'mariamwahdan32@gmail.com',
+      birthDate: '6-8-2002',
+      password: 'Mariam@123',
+      confirmPassword: 'Aml@123',
+    };
   }
 }
