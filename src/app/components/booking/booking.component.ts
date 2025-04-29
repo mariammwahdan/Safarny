@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -7,6 +7,8 @@ import {
   ReactiveFormsModule,
   FormsModule,
   FormBuilder,
+  FormArray, 
+  FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
@@ -19,8 +21,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
-
-
+import { TripExtrasService } from '../../services/trip-extras.service';
+import { Booking, TripExtra } from '../../types/booking';  
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -48,15 +50,15 @@ import { Trip } from '../../types/trips';
 export class BookingComponent implements OnInit {
   tripId!: number;
   tripData!: Trip;
-  tripForm!: FormGroup;
-  extrasOptions: string[] = [];
-  selectedExtras: string[] = [];
+  bookingForm!: FormGroup;
+  tripExtras: TripExtra[] = [];
   totalPrice: number = 0;
-
+  backgroundImageUrl = 'booking.png'; 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder
+    private fb: FormBuilder, 
+    private extrasService: TripExtrasService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state && navigation.extras.state['trip']) {
@@ -80,86 +82,71 @@ export class BookingComponent implements OnInit {
   }
 
   initForm() {
-    this.tripForm = this.fb.group({
+    this.bookingForm = this.fb.group({
       numberOfSeats: [1, [Validators.required, Validators.min(1)]],
-      selectedExtras: [[]],
+      selectedExtras: this.fb.array([]), // FormArray for checkboxes/multiple selections
     });
-
-    // Watch number of seats change
-    this.tripForm.get('numberOfSeats')?.valueChanges.subscribe(() => {
-      this.updateTotalPrice();
-    });
-
-    // Watch selected extras change
-    this.tripForm.get('selectedExtras')?.valueChanges.subscribe(() => {
+  
+    this.bookingForm.get('numberOfSeats')?.valueChanges.subscribe(() => {
       this.updateTotalPrice();
     });
   }
-
   ngAfterViewInit() {
-    // Suggest extras based on transportationType
-    if (this.tripData.transportationType.toLowerCase() === 'flight') {
-      this.extrasOptions = ['Meal', 'First Class Upgrade', 'Extra Luggage'];
-    } else if (this.tripData.transportationType.toLowerCase() === 'train') {
-      this.extrasOptions = ['Meal', 'First Class Upgrade', 'WiFi'];
-    } else if (this.tripData.transportationType.toLowerCase() === 'bus') {
-      this.extrasOptions = ['WiFi', 'AC', 'Extra Legroom'];
-    } else {
-      this.extrasOptions = ['Insurance', 'Priority Boarding'];
-    }
+    this.tripExtras = this.extrasService.getExtrasByTransport(this.tripData.transportationType);
+    const extrasFormArray = this.bookingForm.get('selectedExtras') as FormArray;
 
+    this.tripExtras.forEach(extra => {
+      extrasFormArray.push(
+        this.fb.group({
+          name: [extra.extrasName],
+          quantity: [0, [Validators.min(0)]],
+          price: [extra.extrasPrice],
+        })
+      );
+    });
+
+    extrasFormArray.valueChanges.subscribe(() => this.updateTotalPrice());
     this.updateTotalPrice();
   }
 
-  // check selected extras
-  checkSelectedExtras(extras: string[]): number {
-    let total = 0;
-    for (const extra of extras) {
-      if (extra === 'Meal') {
-        total += 50;
-      }
-      else if (extra === 'First Class Upgrade') {
-        total += 100;
-      }
-      else if (extra === 'Extra Luggage') {
-        total += 150;
-      }
-      else if (extra === 'WiFi') {
-        total += 20;
-      }
-      else if (extra === 'AC') {
-        total += 30;
-      }
-      else if (extra === 'Extra Legroom') {
-        total += 40;
-      }
-      else if (extra === 'Insurance') {
-        total += 60;
-      }
-      else if (extra === 'Priority Boarding') {
-        total += 80;
-      }
-      else {
-        total += 50; // Default price for any other extra
-      }
-    }
-    return total;
-
+  get selectedExtrasControls() {
+    return (this.bookingForm.get('selectedExtras') as FormArray).controls;
   }
-    
+
 
   updateTotalPrice() {
-    const seats = this.tripForm.get('numberOfSeats')?.value || 1;
-    // const extrasCount = (this.tripForm.get('selectedExtras')?.value || []).length;
-    const basePrice = this.tripData.price;
+    const seats = this.bookingForm.get('numberOfSeats')?.value || 1;
+    const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
+    let extrasPrice = 0;
 
-    let extrasPrice = this.checkSelectedExtras(this.tripForm.get('selectedExtras')?.value || []);
-
-    this.totalPrice = (basePrice * seats) + (extrasPrice);
+    extrasArray.controls.forEach(control => {
+      const quantity = control.get('quantity')?.value || 0;
+      const price = control.get('price')?.value || 0;
+      extrasPrice += quantity * price;
+    });
+    this.totalPrice = (this.tripData.price * seats) + (extrasPrice);
   }
 
   proceedToPayment() {
-    console.log('Booking confirmed with details:', this.tripForm.value);
+    const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
+    const selectedExtras = extrasArray.controls
+      .map(control => {
+        const name = control.get('name')?.value;
+        const quantity = control.get('quantity')?.value;
+        return { name, quantity };
+      })
+      .filter(extra => extra.quantity > 0)
+      .map(extra => `${extra.name} x${extra.quantity}`);
+
+    const bookingDetails: Booking = {
+      tripid: this.tripId,
+      numberOfSeats: this.bookingForm.get('numberOfSeats')?.value,
+      selectedExtras,
+      totalPrice: this.totalPrice,
+    };
+
+    console.log('Booking details:', bookingDetails);
     alert('Booking confirmed! 🎉');
+    // this.router.navigate(['/payment'], { state: { booking: bookingDetails } });
   }
 }
