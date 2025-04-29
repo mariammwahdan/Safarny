@@ -19,6 +19,7 @@
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
 }
 
 .section-title {
@@ -119,6 +120,18 @@ input[readonly] {
 
 .update-btn:hover:not(:disabled) {
   background: #7559d3;
+}
+/* personal-details.component.css */
+.success-message {
+  color: green;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.error-message {
+  color: red;
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 
 /* Responsive */

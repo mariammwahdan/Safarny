@@ -52,17 +52,6 @@ export class SignupComponent {
 
   signupForm: FormGroup;
 
-  users: User[] = [
-    {
-      firstname: 'Aml',
-      lastname: 'Mohamed',
-      phone: '0123456789',
-      email: 'aml@gmail.com',
-      birthDate: '1-12-2001',
-      password: 'Aml@123',
-      confirmPassword: 'Aml@123',
-    },
-  ];
 
   constructor(private fb: FormBuilder) {
     this.signupForm = this.fb.group(

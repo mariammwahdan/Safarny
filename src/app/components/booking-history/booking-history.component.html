@@ -1,0 +1,14 @@
+<div class="booking-history">
+  <h2 class="title">Booking History</h2>
+
+  <div *ngFor="let booking of bookings" class="booking-card">
+    <div class="item">{{ booking.date }}</div>
+    <div class="item status" [ngClass]="booking.status.toLowerCase()">
+      {{ booking.status }}
+    </div>
+    <div class="item">{{ booking.time }}</div>
+    <div class="item">{{ booking.from }}</div>
+    <div class="item arrow">→</div>
+    <div class="item">{{ booking.to }}</div>
+  </div>
+</div>
