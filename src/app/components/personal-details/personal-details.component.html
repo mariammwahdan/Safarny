@@ -1,0 +1,73 @@
+<div class="profile-wrapper">
+  <div>
+    <h2 class="profile">Profile</h2>
+    <p>View & Update Your Personal and Contact Information</p>
+  </div>
+
+  <form [formGroup]="updateForm" (ngSubmit)="updateData()">
+    <div class="card">
+      <h2 class="section-title">Contact Information</h2>
+      <div class="form-grid">
+        <div class="field-wrapper">
+          <label>Email</label>
+          <div class="input-wrapper">
+            <input type="email" formControlName="email" />
+          </div>
+        </div>
+
+        <div class="field-wrapper">
+          <label>Phone Number</label>
+          <div class="input-wrapper">
+            <input type="text" formControlName="phone" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="card">
+      <h2 class="section-title">Personal Information</h2>
+      <div class="form-grid">
+        <div class="field-wrapper">
+          <label>First Name</label>
+          <div class="input-wrapper">
+            <input type="text" formControlName="firstname" />
+          </div>
+        </div>
+
+        <div class="field-wrapper">
+          <label>Last Name</label>
+          <div class="input-wrapper">
+            <input type="text" formControlName="lastname" />
+          </div>
+        </div>
+
+        <div class="field-wrapper full-width">
+          <label>Birthday</label>
+          <div class="input-wrapper">
+            <input type="date" formControlName="birthdate" />
+          </div>
+          <!-- <p>This cannot be changed later.</p> -->
+        </div>
+      </div>
+    </div>
+
+    <div class="update-btn-wrapper">
+      <button
+        type="submit"
+        [disabled]="!updateForm.dirty || !updateForm.valid"
+        class="update-btn"
+      >
+        Update Profile
+      </button>
+    </div>
+  </form>
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+</div>

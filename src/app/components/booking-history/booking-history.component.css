@@ -1,0 +1,46 @@
+.booking-history {
+  padding: 1.5rem;
+
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  color: #0a58ca;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.booking-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+  padding: 20px 20px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  background-color: #ffffff;
+}
+
+.item {
+  margin: 0 5px;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.status.assigned {
+  color: green;
+}
+
+.status.canceled {
+  color: red;
+}
+
+.arrow {
+  font-weight: bold;
+  font-size: 18px;
+}

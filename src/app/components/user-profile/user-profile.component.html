@@ -1,0 +1,72 @@
+<mat-drawer-container class="drawer-container">
+  <mat-drawer mode="side" opened class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="logo mt-5">Safarny</h2>
+      <div class="user-info mt-4">
+        <img
+          src="https://img.freepik.com/premium-vector/cute-woman-avatar-profile-vector-illustration_1058532-14592.jpg"
+          class="avatar"
+          alt="User Avatar"
+        />
+        <p class="username">Mimy</p>
+      </div>
+      <div class="sign-out">
+        <a href="#">Sign out</a>
+      </div>
+    </div>
+
+    <ul class="menu">
+      <li
+        [class.active]="selectedMenu === 'profile'"
+        (click)="selectMenu('profile')"
+      >
+        User Profile
+      </li>
+      <li
+        [class.active]="selectedMenu === 'bookings'"
+        (click)="selectMenu('bookings')"
+      >
+        Booking History
+      </li>
+      <li
+        [class.active]="selectedMenu === 'places'"
+        (click)="selectMenu('places')"
+      >
+        Saved Places
+      </li>
+      <li
+        [class.active]="selectedMenu === 'trips'"
+        (click)="selectMenu('trips')"
+      >
+        Saved Trips
+      </li>
+      <li
+        [class.active]="selectedMenu === 'payments'"
+        (click)="selectMenu('payments')"
+      >
+        Payments
+      </li>
+      <li
+        [class.active]="selectedMenu === 'settings'"
+        (click)="selectMenu('settings')"
+      >
+        Settings
+      </li>
+    </ul>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <div class="profile-content">
+      <app-personal-details
+        *ngIf="selectedMenu === 'profile'"
+      ></app-personal-details>
+      <app-booking-history
+        *ngIf="selectedMenu === 'bookings'"
+      ></app-booking-history>
+      <!-- <app-saved-places *ngIf="selectedMenu === 'places'"></app-saved-places>
+           <app-saved-trips *ngIf="selectedMenu === 'trips'"></app-saved-trips>
+           <app-payments *ngIf="selectedMenu === 'payments'"></app-payments>
+           <app-settings *ngIf="selectedMenu === 'settings'"></app-settings> -->
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
