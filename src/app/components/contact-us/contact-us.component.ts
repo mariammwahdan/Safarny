@@ -15,11 +15,12 @@ export class ContactUsComponent {
   fields: string[] = ['name', 'email', 'contact', 'message'];
   hasError: boolean = false;
 
+ 
   submitForm(event: Event) {
     event.preventDefault();
     this.hasError = false; 
 
-    this.fields.forEach((id) => {
+    this.fields.forEach((id: string) => {
       const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement;
       const error = document.getElementById(`${id}-error`) as HTMLParagraphElement;
       const value = input?.value?.trim() ?? '';
@@ -29,11 +30,11 @@ export class ContactUsComponent {
         return;
       }
 
-      input.classList.remove('border-red-500', 'bg-red-100');
+      input.classList.remove('border-red-500'); 
       error.classList.add('hidden');
 
       if (value === '') {
-        input.classList.add('border-red-500', 'bg-red-100');
+        input.classList.add('border-red-500'); 
         error.textContent = `${this.capitalize(id)} is required`;
         error.classList.remove('hidden');
         this.hasError = true;
@@ -42,7 +43,7 @@ export class ContactUsComponent {
       if (id === 'email' && value !== '') {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
-          input.classList.add('border-red-500', 'bg-red-100');
+          input.classList.add('border-red-500');
           error.textContent = 'Please enter a valid email address';
           error.classList.remove('hidden');
           this.hasError = true;
@@ -50,14 +51,14 @@ export class ContactUsComponent {
       }
 
       if (id === 'name' && /\d/.test(value)) {
-        input.classList.add('border-red-500', 'bg-red-100');
+        input.classList.add('border-red-500');
         error.textContent = 'Name must not contain numbers';
         error.classList.remove('hidden');
         this.hasError = true;
       }
 
       if (id === 'name' && /[;,!?]/.test(value)) {
-        input.classList.add('border-red-500', 'bg-red-100');
+        input.classList.add('border-red-500');
         error.textContent = 'Name must not contain ; , ! or ?';
         error.classList.remove('hidden');
         this.hasError = true;
@@ -65,7 +66,7 @@ export class ContactUsComponent {
 
       if (id === 'contact' && value !== '') {
         if (value.length < 10 || !/^\+?[0-9\s\-]+$/.test(value)) {
-          input.classList.add('border-red-500', 'bg-red-100');
+          input.classList.add('border-red-500');
           error.textContent = 'Please enter a valid phone number';
           error.classList.remove('hidden');
           this.hasError = true;
@@ -73,7 +74,7 @@ export class ContactUsComponent {
       }
     });
 
-   
+  
     if (!this.hasError) {
       window.location.href = 'after-sending-message.html'; 
     }
@@ -82,6 +83,14 @@ export class ContactUsComponent {
 
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+
+  clearError(id: string): void {
+    const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement;
+    const error = document.getElementById(`${id}-error`) as HTMLParagraphElement;
+    input.classList.remove('border-red-500');
+    error.classList.add('hidden');
   }
   
 
