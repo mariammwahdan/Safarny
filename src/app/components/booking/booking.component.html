@@ -1,133 +1,133 @@
-<img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
+<mat-card class="p-6 shadow-xl rounded-xl relative overflow-hidden"
+    style="background-image: url('booking.jpg'); background-size: cover; background-position: center;">
+  <!-- Overlay with just black opacity -->
+  <div class="absolute inset-0 bg-black/50"></div>
 
-<div class="absolute left-1/2 transform -translate-x-1/2 top-2/5 w-11/12 md:w-3/4 lg:w-2/3">
-  <mat-card class="p-4 shadow-lg bg-white bg-opacity-95 backdrop-blur-sm rounded-xl border border-gray-100">
-    <div class="flex flex-col items-center" >
-      <h1 class="text-2xl font-bold mb-4">Trip Details</h1>
+  <!-- Content container with z-index to appear above the overlay -->
+  <div class="flex flex-col items-center relative z-10">
+    <div class="pt-8 mb-4"></div>
+    <h1 class="text-4xl text-amber-300 font-bold mb-8">Trip Details</h1>
 
-      <!-- Existing trip info (FROM, TO, Departure/Arrival) -->
-      <div class="flex flex-col md:flex-row justify-between w-full mb-6">
-        <div class="flex-1 mb-4 md:mb-0">
-          <div class="text-sm text-gray-500 uppercase">From</div>
-          <div class="text-xl font-bold">{{ tripData.source }}</div>
-        </div>
+    <!-- Existing trip info (FROM, TO, Departure/Arrival) -->
+    <div class="flex flex-col md:flex-row justify-between w-full mb-8">
+      <div class="flex-1 mb-4 md:mb-0">
+        <div class="text-base text-gray-300 uppercase font-medium">From</div>
+        <div class="text-3xl font-bold text-orange-300">{{ tripData.source }}</div>
+      </div>
 
-        <div class="flex items-center justify-center">
-          <div class="flex items-center">
-            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-            <div class="w-16 h-px bg-gray-400"></div>
-            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-            <span class="mx-2 text-gray-400 text-2xl">
-              <ng-container
-                [ngSwitch]="tripData.transportationType.toLowerCase()"
-              >
-                <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
-                <mat-icon *ngSwitchCase="'train'">train</mat-icon>
-                <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
-                <mat-icon *ngSwitchDefault>commute</mat-icon>
-              </ng-container>
-            </span>
-            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-            <div class="w-16 h-px bg-gray-400"></div>
-            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
-          </div>
-        </div>
-
-        <div class="flex-1 text-right">
-          <div class="text-sm text-gray-500 uppercase">To</div>
-          <div class="text-xl font-bold">{{ tripData.destination }}</div>
+      <div class="flex items-center justify-center">
+        <div class="flex items-center">
+          <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+          <div class="w-16 h-1 bg-amber-300"></div>
+          <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+          <span class="mx-2 text-amber-300 text-3xl">
+            <ng-container
+              [ngSwitch]="tripData.transportationType.toLowerCase()"
+            >
+              <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
+              <mat-icon *ngSwitchCase="'train'">train</mat-icon>
+              <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
+              <mat-icon *ngSwitchDefault>commute</mat-icon>
+            </ng-container>
+          </span>
+          <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+          <div class="w-16 h-1 bg-amber-300"></div>
+          <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
         </div>
       </div>
 
-      <div
-        class="flex flex-col md:flex-row justify-around w-full text-center mb-6"
-      >
-        <div>
-          <div class="text-gray-500 text-sm mb-1">Departure Time</div>
-          <div class="text-lg font-semibold">{{ tripData.departureTime }}</div>
-        </div>
-
-        <div>
-          <div class="text-gray-500 text-sm mb-1">Arrival Time</div>
-          <div class="text-lg font-semibold">{{ tripData.arrivalTime }}</div>
-        </div>
-
-        <div>
-          <div class="text-gray-500 text-sm mb-1">Base Price</div>
-          <div class="text-lg font-bold">{{ tripData.price }} EGP</div>
-        </div>
+      <div class="flex-1 text-right">
+        <div class="text-base text-gray-300 uppercase font-medium">To</div>
+        <div class="text-3xl font-bold text-orange-300">{{ tripData.destination }}</div>
       </div>
-
-      <!-- Booking Form -->
-      <form [formGroup]="bookingForm" class="w-full space-y-4">
-        <mat-form-field appearance="fill" class="w-full">
-          <mat-label>Number of Seats</mat-label>
-          <input matInput type="number" formControlName="numberOfSeats" />
-        </mat-form-field>
-
-
-        <!-- Extras Selection with Material Checkboxes -->
-        <div formArrayName="selectedExtras" class="space-y-4">
-          <div *ngFor="let extraCtrl of selectedExtrasControls; let i = index" [formGroupName]="i" class="flex justify-between items-center gap-4">
-            <div class="flex-1">
-              <strong>{{ extraCtrl.get('name')?.value }}</strong> ({{ extraCtrl.get('price')?.value }} EGP)
-            </div>
-            <mat-form-field appearance="fill" class="w-24">
-              <mat-label>Qty</mat-label>
-              <input matInput type="number" min="0" formControlName="quantity" />
-            </mat-form-field>
-          </div>
-        </div>
-        
-        <!-- Total Price Breakdown -->
-        <div class="bg-gray-100 p-4 rounded-lg shadow-sm">
-          <h3 class="text-lg font-semibold mb-2">Payment Breakdown</h3>
-          <div class="flex flex-col mb-2">
-            <div class="flex justify-between">
-              <span
-                >Base Price ({{
-                  bookingForm.get("numberOfSeats")?.value
-                }}
-                seats):</span
-              >
-              <span
-                >{{
-                  tripData.price * bookingForm.get("numberOfSeats")?.value
-                }}
-                EGP</span
-              >
-            </div>
-            <strong>Extras</strong> 
-            <ul>
-              <li *ngFor="let ctrl of selectedExtrasControls">
-                <ng-container *ngIf="ctrl.get('quantity')?.value > 0">
-                  ➡️ {{ ctrl.get('name')?.value }} x{{ ctrl.get('quantity')?.value }} 
-                  ({{ ctrl.get('price')?.value * ctrl.get('quantity')?.value }} EGP)
-                </ng-container>
-              </li>
-            </ul>
-            
-          </div>
-          <div class="flex justify-between font-semibold">
-            <span>Total Price:</span>
-            <span>{{ totalPrice }} EGP</span>
-          </div>
-        </div>
-
-        <div class="mt-6 text-center">
-          <button
-            mat-flat-button
-            color="primary"
-            class="px-8 py-2 rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md"
-            [disabled]="!bookingForm.valid"
-            (click)="proceedToPayment()"
-          >
-            Proceed to Payment
-          </button>
-        </div>
-      </form>
     </div>
-  </mat-card>
-</div>
-<div class="h-1/4" style="min-height: 800px; max-height: 1200px"></div>
 
+    <div
+      class="flex flex-col md:flex-row justify-around w-full text-center mb-8"
+    >
+      <div class="mb-4 md:mb-0">
+        <div class="text-gray-300 text-base mb-2 font-medium">Departure Time</div>
+        <div class="text-2xl font-semibold text-amber-300">{{ tripData.departureTime }}</div>
+      </div>
+
+      <div class="mb-4 md:mb-0">
+        <div class="text-gray-300 text-base mb-2 font-medium">Arrival Time</div>
+        <div class="text-2xl font-semibold text-amber-300">{{ tripData.arrivalTime }}</div>
+      </div>
+
+      <div>
+        <div class="text-gray-300 text-base mb-2 font-medium">Base Price</div>
+        <div class="text-2xl font-bold text-amber-300">{{ tripData.price }} EGP</div>
+      </div>
+    </div>
+
+    <!-- Booking Form -->
+    <form [formGroup]="bookingForm" class="w-full space-y-6 bg-white/20 p-6 rounded-lg shadow-md backdrop-blur-sm">
+      <div class="bg-white/20 p-4 rounded-lg shadow-md backdrop-blur-sm w-full mb-4">
+        <div class="text-lg text-amber-300 mb-2">Number of Seats</div>
+        <input matInput type="number" formControlName="numberOfSeats" class="text-2xl w-full bg-transparent border-0 text-white focus:outline-none" />
+      </div>
+
+
+    <!-- Extras Selection with Material Checkboxes -->
+    <div formArrayName="selectedExtras" class="space-y-5">
+      <h3 class="text-2xl font-semibold text-amber-300 mb-3">Additional Services</h3>
+      <div *ngFor="let extraCtrl of selectedExtrasControls; let i = index" [formGroupName]="i" class="flex justify-between items-center gap-4 bg-white/10 p-4 rounded-lg">
+        <div class="flex-1">
+          <strong class="text-xl text-white">{{ extraCtrl.get('name')?.value }}</strong> 
+          <span class="text-amber-300 text-lg">({{ extraCtrl.get('price')?.value }} EGP)</span>
+        </div>
+        <div class="bg-white/20 p-3 rounded-lg shadow-md backdrop-blur-sm w-28">
+          <div class="text-base text-amber-300 mb-1">Qty</div>
+          <input matInput type="number" min="0" formControlName="quantity" class="text-xl w-full bg-transparent border-0 text-white focus:outline-none" />
+        </div>
+      </div>
+    </div>
+    
+      
+      <!-- Total Price Breakdown -->
+      <div class="bg-white/20 p-6 rounded-lg shadow-md backdrop-blur-sm">
+        <h3 class="text-2xl font-semibold mb-4 text-amber-300">Payment Breakdown</h3>
+        <div class="flex flex-col mb-4 text-white">
+          <div class="flex justify-between text-xl mb-2">
+            <span>Base Price ({{
+              bookingForm.get("numberOfSeats")?.value
+            }}
+            seats):</span>
+            <span>{{
+              tripData.price * bookingForm.get("numberOfSeats")?.value
+            }}
+            EGP</span>
+          </div>
+          <strong class="text-xl text-amber-200 mb-2">Extras</strong> 
+          <ul class="space-y-2">
+            <li *ngFor="let ctrl of selectedExtrasControls" class="text-lg">
+              <ng-container *ngIf="ctrl.get('quantity')?.value > 0">
+                ➡️ {{ ctrl.get('name')?.value }} x{{ ctrl.get('quantity')?.value }} 
+                 ({{ ctrl.get('price')?.value * ctrl.get('quantity')?.value }} EGP)
+              </ng-container>
+            </li>
+          </ul>
+        </div>
+        <div class="flex justify-between font-bold text-2xl border-t border-white/30 pt-3">
+          <span class="text-white">Total Price:</span>
+          <span class="text-amber-300">{{ totalPrice }} EGP</span>
+        </div>
+      </div>
+
+      <div class="mt-10 text-center">
+        <button
+          mat-flat-button
+          color="primary"
+          class="px-12 py-4 rounded-full text-2xl font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-xl transition-all duration-300 transform hover:scale-105"
+          [disabled]="!bookingForm.valid"
+          (click)="proceedToPayment()"
+        >
+          Proceed to Payment
+        </button>
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<div class="h-1/4" style="min-height: 800px; max-height: 1200px"></div>
