@@ -8,14 +8,15 @@
           class="avatar"
           alt="User Avatar"
         />
-        <p class="username">Mimy</p>
+        <p class="username">{{username}}</p>
       </div>
       <div class="sign-out">
-        <a href="#">Sign out</a>
+        <a (click)="logout()">Sign out</a>
       </div>
     </div>
 
     <ul class="menu">
+      <li (click)="goHome()">Home</li>
       <li
         [class.active]="selectedMenu === 'profile'"
         (click)="selectMenu('profile')"
@@ -35,6 +36,7 @@
       >
         Payments
       </li>
+
 
     </ul>
   </mat-drawer>
