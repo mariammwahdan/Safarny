@@ -4,12 +4,13 @@ import { PersonalDetailsComponent } from "../personal-details/personal-details.c
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { BookingHistoryComponent } from '../booking-history/booking-history.component';
 import { CommonModule } from '@angular/common';
+import { ProfilePaymentsComponent } from "../profile-payments/profile-payments.component";
 @Component({
   selector: 'app-user-profile',
   standalone: true,
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css'],
-  imports: [PersonalDetailsComponent,BookingHistoryComponent, MatSidenavModule,CommonModule],
+  imports: [PersonalDetailsComponent, BookingHistoryComponent, MatSidenavModule, CommonModule, ProfilePaymentsComponent],
 })
 export class UserProfileComponent  implements OnInit {
   constructor(public _Nav: AuthService) {}

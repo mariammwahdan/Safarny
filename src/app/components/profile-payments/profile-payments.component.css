@@ -1,0 +1,9 @@
+.payments-wrapper {
+  margin: auto;
+}
+.payments-wrapper .title {
+  color: #0a58ca;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
