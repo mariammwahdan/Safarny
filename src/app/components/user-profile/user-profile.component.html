@@ -28,30 +28,14 @@
       >
         Booking History
       </li>
-      <li
-        [class.active]="selectedMenu === 'places'"
-        (click)="selectMenu('places')"
-      >
-        Saved Places
-      </li>
-      <li
-        [class.active]="selectedMenu === 'trips'"
-        (click)="selectMenu('trips')"
-      >
-        Saved Trips
-      </li>
+
       <li
         [class.active]="selectedMenu === 'payments'"
         (click)="selectMenu('payments')"
       >
         Payments
       </li>
-      <li
-        [class.active]="selectedMenu === 'settings'"
-        (click)="selectMenu('settings')"
-      >
-        Settings
-      </li>
+
     </ul>
   </mat-drawer>
 
@@ -63,10 +47,9 @@
       <app-booking-history
         *ngIf="selectedMenu === 'bookings'"
       ></app-booking-history>
-      <!-- <app-saved-places *ngIf="selectedMenu === 'places'"></app-saved-places>
-           <app-saved-trips *ngIf="selectedMenu === 'trips'"></app-saved-trips>
-           <app-payments *ngIf="selectedMenu === 'payments'"></app-payments>
-           <app-settings *ngIf="selectedMenu === 'settings'"></app-settings> -->
+
+           <app-profile-payments *ngIf="selectedMenu === 'payments'"></app-profile-payments>
+
     </div>
   </mat-drawer-content>
 </mat-drawer-container>
