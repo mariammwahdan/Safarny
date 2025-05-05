@@ -16,16 +16,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-interface User {
-  firstname: string;
-  lastname: string;
-  email?: string;
-  phone?: string;
-  gender?: string;
-  birthDate?: string;
-  password: string;
-  confirmPassword?: string;
-}
+import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
+import { User } from '../../types/user';
+import { AuthService } from '../../core/services/auth.service';
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -53,7 +47,7 @@ export class SignupComponent {
   signupForm: FormGroup;
 
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private firebaseAuth: FirebaseAuthService) {
     this.signupForm = this.fb.group(
       {
         firstName: ['', signupValidators.firstname],
@@ -84,7 +78,7 @@ export class SignupComponent {
     this.close.emit();
   }
 
-  submitForm() {
+  async submitForm() {
     this.submitted = true;
     if (this.signupForm.valid) {
       const user: User = {
@@ -97,10 +91,16 @@ export class SignupComponent {
         password: this.signupForm.value.password || '',
         confirmPassword: this.signupForm.value.confirmPassword || undefined,
       };
-      console.log('Signup Data:', user);
-      this.onClose();
+      try {
+        await this.firebaseAuth.signup(user); // ✅ Send to Firebase
+        console.log('Signup successful!');
+        this.onClose();
+      } catch (err: any) {
+        console.error('Signup error:', err);
+        this.registerErrorMsg = err.message || 'An error occurred.';
+      }
     } else {
-      console.log('Signup Data:', 'FAILED');
+      console.log('Signup Data: INVALID');
     }
   }
 }

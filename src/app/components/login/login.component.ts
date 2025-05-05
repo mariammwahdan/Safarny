@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -16,13 +17,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
+  loginError: string = '';
   submitted = false;
   @Input() show = false;
   @Output() close = new EventEmitter<void>();
 
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private authService: AuthService) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required]],
       password: ['', Validators.required],
@@ -38,11 +40,17 @@ export class LoginComponent {
     this.close.emit();
   }
 
-  submitForm() {
+  async submitForm() {
     this.submitted = true;
     if (this.loginForm.valid) {
-      console.log('Login Data:', this.loginForm.value);
-      this.onClose();
+      try {
+        await this.authService.login(this.loginForm.value);
+        console.log('Login successful!');
+        this.onClose();
+      } catch (err: any) {
+        console.error('Login failed:', err);
+        this.loginError = err.message || 'Login failed. Please try again.';
+      }
     } else {
       this.loginForm.markAllAsTouched();
     }
