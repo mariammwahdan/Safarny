@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   FormsModule,
   FormBuilder,
-  FormArray, 
+  FormArray,
   FormControl,
   FormGroup,
   Validators,
@@ -21,8 +21,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
-import { TripExtrasService } from '../../services/trip-extras.service';
-import { Booking, TripExtra } from '../../types/booking';  
+import { TripExtrasService } from '../../core/services/trip-extras.service';
+import { Booking, TripExtra } from '../../types/booking';
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -45,19 +45,17 @@ import { Booking, TripExtra } from '../../types/booking';
   templateUrl: './booking.component.html',
   styleUrl: './booking.component.css',
 })
-
-
 export class BookingComponent implements OnInit {
   tripId!: number;
   tripData!: Trip;
   bookingForm!: FormGroup;
   tripExtras: TripExtra[] = [];
   totalPrice: number = 0;
-  backgroundImageUrl = 'booking.png'; 
+  backgroundImageUrl = 'booking.png';
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private extrasService: TripExtrasService
   ) {
     const navigation = this.router.getCurrentNavigation();
@@ -86,16 +84,18 @@ export class BookingComponent implements OnInit {
       numberOfSeats: [1, [Validators.required, Validators.min(1)]],
       selectedExtras: this.fb.array([]), // FormArray for checkboxes/multiple selections
     });
-  
+
     this.bookingForm.get('numberOfSeats')?.valueChanges.subscribe(() => {
       this.updateTotalPrice();
     });
   }
   ngAfterViewInit() {
-    this.tripExtras = this.extrasService.getExtrasByTransport(this.tripData.transportationType);
+    this.tripExtras = this.extrasService.getExtrasByTransport(
+      this.tripData.transportationType
+    );
     const extrasFormArray = this.bookingForm.get('selectedExtras') as FormArray;
 
-    this.tripExtras.forEach(extra => {
+    this.tripExtras.forEach((extra) => {
       extrasFormArray.push(
         this.fb.group({
           name: [extra.extrasName],
@@ -113,30 +113,29 @@ export class BookingComponent implements OnInit {
     return (this.bookingForm.get('selectedExtras') as FormArray).controls;
   }
 
-
   updateTotalPrice() {
     const seats = this.bookingForm.get('numberOfSeats')?.value || 1;
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
     let extrasPrice = 0;
 
-    extrasArray.controls.forEach(control => {
+    extrasArray.controls.forEach((control) => {
       const quantity = control.get('quantity')?.value || 0;
       const price = control.get('price')?.value || 0;
       extrasPrice += quantity * price;
     });
-    this.totalPrice = (this.tripData.price * seats) + (extrasPrice);
+    this.totalPrice = this.tripData.price * seats + extrasPrice;
   }
 
   proceedToPayment() {
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
     const selectedExtras = extrasArray.controls
-      .map(control => {
+      .map((control) => {
         const name = control.get('name')?.value;
         const quantity = control.get('quantity')?.value;
         return { name, quantity };
       })
-      .filter(extra => extra.quantity > 0)
-      .map(extra => `${extra.name} x${extra.quantity}`);
+      .filter((extra) => extra.quantity > 0)
+      .map((extra) => `${extra.name} x${extra.quantity}`);
 
     const bookingDetails: Booking = {
       tripid: this.tripId,
