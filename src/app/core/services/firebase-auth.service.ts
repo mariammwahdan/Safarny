@@ -43,13 +43,17 @@ export class FirebaseAuthService {
   async getUserData(uid: string): Promise<any> {
     const userDocRef = doc(this.firestore, `users/${uid}`);
     const userSnap = await getDoc(userDocRef);
+
     const userData = userSnap.data();
     localStorage.setItem('user', JSON.stringify(userData));
+
     return userSnap.exists() ? userSnap.data() : null;
   }
   async updateUserData(uid: string, data: any): Promise<void> {
     const userRef = doc(this.firestore, `users/${uid}`);
+
     localStorage.setItem('user', JSON.stringify(data));
+
     await updateDoc(userRef, data);
   }
 }

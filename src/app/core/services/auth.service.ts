@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../../types/user';
 import { FirebaseAuthService } from './firebase-auth.service';
+
 import { FirebaseError } from 'firebase/app';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -30,6 +32,7 @@ export class AuthService {
 
   async login(credentials: { email: string; password: string }): Promise<void> {
     try {
+
       const userCred = await this.firebaseAuth.login(
         credentials.email,
         credentials.password
@@ -50,6 +53,7 @@ export class AuthService {
       } else {
         throw new Error('An error occurred during login. Please try again.');
       }
+
     }
   }
 
