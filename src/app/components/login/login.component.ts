@@ -42,6 +42,7 @@ export class LoginComponent {
 
   async submitForm() {
     this.submitted = true;
+    this.loginError = '';
     if (this.loginForm.valid) {
       try {
         await this.authService.login(this.loginForm.value);
