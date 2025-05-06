@@ -18,6 +18,7 @@ export class FirebaseAuthService {
 
     const userCred = await createUserWithEmailAndPassword(this.auth, email, password);
 
+
     const userDocRef = doc(this.firestore, `users/${userCred.user.uid}`);
     await setDoc(userDocRef, {
       uid: userCred.user.uid,
@@ -56,4 +57,12 @@ export class FirebaseAuthService {
 
     await updateDoc(userRef, data);
   }
+
+  async getCurrentUserId(): Promise<string | null> {
+    const user = this.auth.currentUser;
+    return user ? user.uid : null;
+  }
+
+
+  
 }

@@ -23,6 +23,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
 import { TripExtrasService } from '../../core/services/trip-extras.service';
 import { Booking, TripExtra } from '../../types/booking';
+import {FirebaseAuthService} from '../../core/services/firebase-auth.service';
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -33,7 +34,7 @@ import { Booking, TripExtra } from '../../types/booking';
     MatRadioModule,
     ReactiveFormsModule,
     FormsModule,
-    MatFormFieldModule,
+    // MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
     MatDatepickerModule,
@@ -56,7 +57,9 @@ export class BookingComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
-    private extrasService: TripExtrasService
+    private extrasService: TripExtrasService,
+    private firebaseAuthService: FirebaseAuthService
+
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state && navigation.extras.state['trip']) {
@@ -126,7 +129,13 @@ export class BookingComponent implements OnInit {
     this.totalPrice = this.tripData.price * seats + extrasPrice;
   }
 
-  proceedToPayment() {
+  async proceedToPayment() {
+    const uid = await this.firebaseAuthService.getCurrentUserId();
+    if (!uid) {
+      alert('User not logged in!');
+      return;
+    }
+  
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
     const selectedExtras = extrasArray.controls
       .map((control) => {
@@ -136,16 +145,18 @@ export class BookingComponent implements OnInit {
       })
       .filter((extra) => extra.quantity > 0)
       .map((extra) => `${extra.name} x${extra.quantity}`);
-
+  
     const bookingDetails: Booking = {
+      userid: uid,
       tripid: this.tripId,
       numberOfSeats: this.bookingForm.get('numberOfSeats')?.value,
       selectedExtras,
       totalPrice: this.totalPrice,
     };
-
+  
     console.log('Booking details:', bookingDetails);
     alert('Booking confirmed! 🎉');
     // this.router.navigate(['/payment'], { state: { booking: bookingDetails } });
   }
+  
 }

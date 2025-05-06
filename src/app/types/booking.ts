@@ -1,4 +1,5 @@
 export interface Booking {
+    userid: string;
     tripid: number;
     numberOfSeats: number;
     selectedExtras: string[];
