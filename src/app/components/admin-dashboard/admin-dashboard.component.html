@@ -1,0 +1,106 @@
+<mat-drawer-container class="drawer-container">
+  <mat-drawer mode="side" opened class="sidebar">
+    <div class="sidebar-header">
+      <h2 class="logo mt-5">Safarny Admin</h2>
+      <div class="user-info mt-4">
+        <img
+          src="https://img.freepik.com/premium-vector/cute-woman-avatar-profile-vector-illustration_1058532-14592.jpg"
+          class="avatar"
+          alt="Admin Avatar"
+        />
+        <p class="username">{{username}}</p>
+      </div>
+      <div class="sign-out">
+        <a (click)="logout()">Sign out</a>
+      </div>
+    </div>
+
+    <ul class="menu">
+      <li (click)="goHome()">Home</li>
+      <li
+        [class.active]="selectedMenu === 'dashboard'"
+        (click)="selectMenu('dashboard')"
+      >
+        Dashboard
+      </li>
+      <li
+        [class.active]="selectedMenu === 'users'"
+        (click)="selectMenu('users')"
+      >
+        Manage Users
+      </li>
+      <li
+        [class.active]="selectedMenu === 'trips'"
+        (click)="selectMenu('trips')"
+      >
+        Manage Trips
+      </li>
+      <li
+        [class.active]="selectedMenu === 'bookings'"
+        (click)="selectMenu('bookings')"
+      >
+        Manage Bookings
+      </li>
+    </ul>
+  </mat-drawer>
+
+  <mat-drawer-content>
+    <div class="profile-content">
+      <div *ngIf="selectedMenu === 'dashboard'" class="dashboard-content">
+        <h2>Welcome to Admin Dashboard</h2>
+        <!-- Add your dashboard content here -->
+      </div>
+      <div *ngIf="selectedMenu === 'users'" class="users-content">
+        <h2>Manage Users</h2>
+        <div class="table-container">
+          <table mat-table [dataSource]="users" class="mat-elevation-z8">
+            <!-- First Name Column -->
+            <ng-container matColumnDef="firstname">
+              <th mat-header-cell *matHeaderCellDef>First Name</th>
+              <td mat-cell *matCellDef="let user">{{user.firstname}}</td>
+            </ng-container>
+
+            <!-- Last Name Column -->
+            <ng-container matColumnDef="lastname">
+              <th mat-header-cell *matHeaderCellDef>Last Name</th>
+              <td mat-cell *matCellDef="let user">{{user.lastname}}</td>
+            </ng-container>
+
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef>Email</th>
+              <td mat-cell *matCellDef="let user">{{user.email}}</td>
+            </ng-container>
+
+            <!-- Phone Column -->
+            <ng-container matColumnDef="phone">
+              <th mat-header-cell *matHeaderCellDef>Phone</th>
+              <td mat-cell *matCellDef="let user">{{user.phone}}</td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef>Actions</th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button color="warn" (click)="deleteUser(user)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </div>
+      <div *ngIf="selectedMenu === 'trips'" class="trips-content">
+        <h2>Manage Trips</h2>
+        <!-- Add your trips management content here -->
+      </div>
+      <div *ngIf="selectedMenu === 'bookings'" class="bookings-content">
+        <h2>Manage Bookings</h2>
+        <!-- Add your bookings management content here -->
+      </div>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

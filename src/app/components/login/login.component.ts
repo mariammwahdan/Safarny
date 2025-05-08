@@ -9,6 +9,8 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -24,7 +26,11 @@ export class LoginComponent {
 
   loginForm: FormGroup;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(
+    private fb: FormBuilder, 
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required]],
       password: ['', Validators.required],
@@ -45,6 +51,16 @@ export class LoginComponent {
     this.loginError = '';
     if (this.loginForm.valid) {
       try {
+        const { email, password } = this.loginForm.value;
+        
+        // Check for admin credentials
+        if (email === 'admin@safarny.com' && password === 'admin') {
+          this.onClose();
+          this.router.navigate(['/dashboard']);
+          return;
+        }
+        
+        // Regular user login
         await this.authService.login(this.loginForm.value);
         console.log('Login successful!');
         this.onClose();
