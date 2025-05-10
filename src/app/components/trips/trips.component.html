@@ -79,10 +79,11 @@
             <mat-label class="text-sm font-medium mr-2 inline-block py-2">Filter by Transportation:</mat-label>
             <mat-form-field appearance="outline" class="w-48">
                 <mat-select [(ngModel)]="selectedTransportation">
-                    <mat-option value="all">All</mat-option>
-                    <mat-option value="flight">Flight</mat-option>
-                    <mat-option value="train">Train</mat-option>
-                    <mat-option value="bus">Bus</mat-option>
+                    <mat-option [value]="null">All</mat-option>
+                    <mat-option [value]="TransportationType.Flight">Flight</mat-option>
+                    <mat-option [value]="TransportationType.Train">Train</mat-option>
+                    <mat-option [value]="TransportationType.Bus">Bus</mat-option>
+                    <mat-option [value]="TransportationType.Car">Car</mat-option>
                 </mat-select>
             </mat-form-field>
         </div>
@@ -113,11 +114,11 @@
                             <span class="w-16 h-px bg-gray-400"></span>
                             <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
                             <span class="text-gray-400 text-xl mx-2">
-                                <ng-container [ngSwitch]="trip.transportationType.toLowerCase()">
-                                    <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
-                                    <mat-icon *ngSwitchCase="'train'">train</mat-icon>
-                                    <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
-                                    <mat-icon *ngSwitchDefault>commute</mat-icon>
+                                <ng-container [ngSwitch]="trip.transportationType">
+                                    <mat-icon *ngSwitchCase="TransportationType.Flight">flight</mat-icon>
+                                    <mat-icon *ngSwitchCase="TransportationType.Train">train</mat-icon>
+                                    <mat-icon *ngSwitchCase="TransportationType.Bus">directions_bus</mat-icon>
+                                    <mat-icon *ngSwitchCase="TransportationType.Car">commute</mat-icon>
                                 </ng-container>
                             </span>
                             <span class="w-2 h-2 bg-gray-400 rounded-full"></span>

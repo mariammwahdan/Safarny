@@ -20,10 +20,11 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Trip } from '../../types/trips';
+import { Trip, TransportationType, TripSearchRequest } from '../../types/trips';
 import { CountryService } from '../../core/services/country.service';
 import { City } from '../../types/city';
 import { finalize } from 'rxjs/operators';
+import { TripService } from '../../core/services/trip.service';
 
 @Component({
   selector: 'app-trips',
@@ -51,19 +52,24 @@ import { finalize } from 'rxjs/operators';
 export class TripsComponent implements OnInit {
   @ViewChild('resultsSection') resultsSection!: ElementRef;
 
-  selectedTransportation: string = 'all';
-  minDate: Date = new Date(); 
+  TransportationType = TransportationType;
+  selectedTransportation: TransportationType | null = null;
+  minDate: Date = new Date();
 
   cities: City[] = [];
   loadingCities = false;
+  availableTrips: Trip[] = [];
+  filteredTrips: Trip[] = [];
+  isLoadingTrips: boolean = false;
+  searchPerformed: boolean = false;
 
   tripForm!: FormGroup;
-  searchPerformed: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private countryService: CountryService,
-    private router: Router
+    private router: Router,
+    private tripService: TripService
   ) {}
 
   ngOnInit() {
@@ -79,7 +85,6 @@ export class TripsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           const cityNames = response.data;
-
           this.cities = cityNames.map((city) => ({
             name: city,
             value: city,
@@ -106,7 +111,6 @@ export class TripsComponent implements OnInit {
       destination: ['', Validators.required],
       departureDate: ['', Validators.required],
       returnDate: [''],
-      numberOfPassengers: [1, [Validators.required, Validators.min(1)]],
     });
 
     this.tripForm.get('tripType')?.valueChanges.subscribe((tripType) => {
@@ -125,45 +129,29 @@ export class TripsComponent implements OnInit {
     this.router.navigate(['/booking', trip.id], { state: { trip: trip } });
   }
 
-  availableTrips: Trip[] = [];
-  isLoadingTrips: boolean = false;
-
   searchTrips() {
+    if (!this.tripForm.valid) return;
+
     this.isLoadingTrips = true;
     this.searchPerformed = true;
-    this.selectedTransportation = 'all';
+    this.selectedTransportation = null;
 
-    setTimeout(() => {
-      this.availableTrips = [
-        {
-          id: 1,
-          source: this.tripForm.value.source,
-          destination: this.tripForm.value.destination,
-          departureDate: this.tripForm.value.departureDate,
-          departureTime: '10:00 AM',
-          arrivalTime: '12:00 PM',
-          duration: '2h',
-          transportationType: 'Flight',
-          price: 100,
-        },
-        {
-          id: 2,
-          source: this.tripForm.value.source,
-          destination: this.tripForm.value.destination,
-          departureDate: this.tripForm.value.departureDate,
-          departureTime: '3:00 PM',
-          arrivalTime: '5:00 PM',
-          duration: '2h',
-          transportationType: 'Train',
-          price: 50,
-        },
-      ];
+    const formValue = this.tripForm.value;
+    const searchRequest: TripSearchRequest = {
+      ...formValue,
+      departureDate: new Date(formValue.departureDate),
+      returnDate: formValue.returnDate ? new Date(formValue.returnDate) : undefined
+    };
+
+    this.tripService.searchTrips(searchRequest).then((trips: Trip[]) => {
+      this.availableTrips = trips;
+      this.filterTrips();
       this.isLoadingTrips = false;
 
       setTimeout(() => {
         this.scrollToResults();
-      }, 100);
-    }, 1500);
+      }, 1500);
+    });
   }
 
   scrollToResults() {
@@ -175,14 +163,9 @@ export class TripsComponent implements OnInit {
     }
   }
 
-  get filteredTrips(): Trip[] {
-    if (!this.availableTrips) return [];
-    if (this.selectedTransportation === 'all') return this.availableTrips;
-
-    return this.availableTrips.filter(
-      (trip) =>
-        trip.transportationType.toLowerCase() ===
-        this.selectedTransportation.toLowerCase()
-    );
+  filterTrips() {
+    this.filteredTrips = this.availableTrips.filter(trip => {
+      return !this.selectedTransportation || trip.transportationType === this.selectedTransportation;
+    });
   }
 }
