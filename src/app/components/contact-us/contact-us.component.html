@@ -15,72 +15,7 @@ style="background-image: url('contactus.jpg')"
     </p>
   </section>
 
- 
-  <!-- <section class="grid gap-8 md:grid-cols-2 items-start mb-12">
-    <div class="space-y-6">
-      <div>
-        <label for="name" class="block text-white mb-2">Name</label>
-        <input
-          id="name"
-          type="text"
-          class="w-full border border-white text-white placeholder-white rounded-lg px-4 py-3 focus:outline-none focus:ring focus:ring-white"
-          placeholder="Enter your name"
-        />
-        <p id="name-error" class="hidden text-red-500 text-sm mt-1">
-          Name is required
-        </p>
-      </div>
 
-      <div>
-        <label for="email" class="block text-white mb-2">Email</label>
-        <input
-          id="email"
-          type="email"
-          class="w-full border border-white text-white placeholder-white rounded-lg px-4 py-3 focus:outline-none focus:ring focus:ring-white"
-          placeholder="example@mail.com"
-        />
-        <p id="email-error" class="hidden text-red-500 text-sm mt-1">
-          email must contain &#64; and .com
-        </p>
-      </div>
-
-      <div>
-        <label for="contact" class="block text-white mb-2">Contact Number</label>
-        <input
-          id="contact"
-          type="text"
-          class="w-full border border-white text-white placeholder-white rounded-lg px-4 py-3 focus:outline-none focus:ring focus:ring-white"
-          placeholder="+20 **********"
-        />
-        <p id="contact-error" class="hidden text-red-500 text-sm mt-1">
-          Please enter a valid phone number
-        </p>
-      </div>
-
-      <div>
-        <label for="message" class="block text-white mb-2">Message</label>
-        <textarea
-          id="message"
-          rows="4"
-          class="w-full border border-white text-white placeholder-white rounded-lg px-4 py-3 focus:outline-none focus:ring focus:ring-white"
-          placeholder="Enter your message here..."
-        ></textarea>
-        <p id="message-error" class="hidden text-red-500 text-sm mt-1">
-          Message is required
-        </p>
-      </div>
-
-      <button
-      id="submitBtn"
-      class="w-full border border-white rounded-full px-8 py-3 bg-primary text-white hover:bg-tertiary transition duration-300 cursor-pointer"
-      (click)="submitForm($event)"
-    >
-      Send Message
-    </button>
-    </div>
-
-
-  </section> -->
 
   <section class="grid gap-8 md:grid-cols-2 items-start mb-12">
     <div class="space-y-6">
@@ -144,4 +79,27 @@ style="background-image: url('contactus.jpg')"
   
 
 </div>
+
+<div id="thankYouPopup" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+  <div class="bg-white text-center rounded-lg shadow-lg p-8 max-w-sm w-full">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Thank You!</h2>
+    <p class="text-gray-600">Your message has been sent. We'll get back to you soon.</p>
+    <!-- <button onclick="document.getElementById('thankYouPopup').classList.add('hidden')" 
+      class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+      Close
+    </button> -->
+    <!-- <button onclick="closePopupAndReset()" 
+  class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+  Close
+</button> -->
+
+<button 
+  (click)="resetFormAndClosePopup()" 
+  class="mt-6 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+  Close
+</button>
+
+  </div>
+</div>
+
 </div>
