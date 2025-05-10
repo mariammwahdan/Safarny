@@ -1,8 +1,9 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -11,6 +12,8 @@ import {
   FormControl,
   FormGroup,
   Validators,
+  ValidatorFn,
+  AbstractControl,
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -23,7 +26,20 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Trip } from '../../types/trips';
 import { TripExtrasService } from '../../core/services/trip-extras.service';
 import { Booking, TripExtra } from '../../types/booking';
-import {FirebaseAuthService} from '../../core/services/firebase-auth.service';
+import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
+import { Firestore, doc, DocumentReference } from '@angular/fire/firestore';
+import { LoginComponent } from '../login/login.component';
+
+// Custom validator factory for Comfort Seat
+function maxComfortSeatValidator(getMax: () => number): ValidatorFn {
+  return (control: AbstractControl) => {
+    if (control.value > getMax()) {
+      return { maxComfort: true };
+    }
+    return null;
+  };
+}
+
 @Component({
   selector: 'app-booking',
   standalone: true,
@@ -42,24 +58,30 @@ import {FirebaseAuthService} from '../../core/services/firebase-auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
+    LoginComponent,
   ],
   templateUrl: './booking.component.html',
   styleUrl: './booking.component.css',
 })
 export class BookingComponent implements OnInit {
-  tripId!: number;
+  tripId!: string;
   tripData!: Trip;
   bookingForm!: FormGroup;
   tripExtras: TripExtra[] = [];
   totalPrice: number = 0;
   backgroundImageUrl = 'booking.png';
+  comfortSeatError: string | null = null;
+  @ViewChild(LoginComponent) loginModal!: LoginComponent;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private fb: FormBuilder,
     private extrasService: TripExtrasService,
-    private firebaseAuthService: FirebaseAuthService
-
+    private firebaseAuthService: FirebaseAuthService,
+    private firestore: Firestore,
+    private snackBar: MatSnackBar
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras?.state && navigation.extras.state['trip']) {
@@ -77,7 +99,7 @@ export class BookingComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
-        this.tripId = +id;
+        this.tripId = id;
       }
     });
   }
@@ -85,27 +107,41 @@ export class BookingComponent implements OnInit {
   initForm() {
     this.bookingForm = this.fb.group({
       numberOfSeats: [1, [Validators.required, Validators.min(1)]],
-      selectedExtras: this.fb.array([]), // FormArray for checkboxes/multiple selections
+      selectedExtras: this.fb.array([]), 
     });
 
     this.bookingForm.get('numberOfSeats')?.valueChanges.subscribe(() => {
       this.updateTotalPrice();
     });
   }
-  ngAfterViewInit() {
-    this.tripExtras = this.extrasService.getExtrasByTransport(
+  async ngAfterViewInit() {
+    this.tripExtras = await this.extrasService.getExtrasByTransport(
       this.tripData.transportationType
     );
     const extrasFormArray = this.bookingForm.get('selectedExtras') as FormArray;
 
     this.tripExtras.forEach((extra) => {
-      extrasFormArray.push(
-        this.fb.group({
-          name: [extra.extrasName],
-          quantity: [0, [Validators.min(0)]],
-          price: [extra.extrasPrice],
-        })
-      );
+      if (extra.isQuantifiable) {
+        let validators = [Validators.min(0)];
+        if (extra.extrasName === 'Comfort Seat') {
+          validators.push(maxComfortSeatValidator(() => this.bookingForm.get('numberOfSeats')?.value || 1));
+        }
+        extrasFormArray.push(
+          this.fb.group({
+            name: [extra.extrasName],
+            quantity: [0, validators],
+            price: [extra.extrasPrice],
+          })
+        );
+      } else {
+        extrasFormArray.push(
+          this.fb.group({
+            name: [extra.extrasName],
+            selected: [false],
+            price: [extra.extrasPrice],
+          })
+        );
+      }
     });
 
     extrasFormArray.valueChanges.subscribe(() => this.updateTotalPrice());
@@ -116,15 +152,38 @@ export class BookingComponent implements OnInit {
     return (this.bookingForm.get('selectedExtras') as FormArray).controls;
   }
 
+  showValidationError(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['error-snackbar']
+    });
+  }
+
   updateTotalPrice() {
     const seats = this.bookingForm.get('numberOfSeats')?.value || 1;
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
     let extrasPrice = 0;
+    this.comfortSeatError = null;
 
-    extrasArray.controls.forEach((control) => {
-      const quantity = control.get('quantity')?.value || 0;
-      const price = control.get('price')?.value || 0;
-      extrasPrice += quantity * price;
+    extrasArray.controls.forEach((control, i) => {
+      if (this.tripExtras[i]?.isQuantifiable) {
+        const quantity = control.get('quantity')?.value || 0;
+        const price = control.get('price')?.value || 0;
+        extrasPrice += quantity * price;
+
+        // Set error for Comfort Seat if quantity exceeds seats
+        if (this.tripExtras[i].extrasName === 'Comfort Seat' && quantity > seats) {
+          this.comfortSeatError = 'Comfort Seat quantity cannot exceed number of seats';
+        }
+      } else {
+        const selected = control.get('selected')?.value;
+        const price = control.get('price')?.value || 0;
+        if (selected) {
+          extrasPrice += price;
+        }
+      }
     });
     this.totalPrice = this.tripData.price * seats + extrasPrice;
   }
@@ -132,23 +191,29 @@ export class BookingComponent implements OnInit {
   async proceedToPayment() {
     const uid = await this.firebaseAuthService.getCurrentUserId();
     if (!uid) {
-      alert('User not logged in!');
+      this.loginModal.open();
       return;
     }
   
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
-    const selectedExtras = extrasArray.controls
-      .map((control) => {
-        const name = control.get('name')?.value;
-        const quantity = control.get('quantity')?.value;
-        return { name, quantity };
-      })
-      .filter((extra) => extra.quantity > 0)
-      .map((extra) => `${extra.name} x${extra.quantity}`);
+    const selectedExtras = extrasArray.controls.map((control, i) => {
+      if (this.tripExtras[i].isQuantifiable) {
+        return {
+          extrasId: control.get('extrasId')?.value,
+          quantity: control.get('quantity')?.value
+        };
+      } else {
+        return {
+          extrasId: control.get('extrasId')?.value,
+          quantity: control.get('selected')?.value ? 1 : 0
+        };
+      }
+    }).filter(extra => extra.quantity > 0);
   
+    const tripRef = doc(this.firestore, 'trips', this.tripId) as DocumentReference<Trip>;
     const bookingDetails: Booking = {
       userid: uid,
-      tripid: this.tripId,
+      tripid: tripRef,
       numberOfSeats: this.bookingForm.get('numberOfSeats')?.value,
       selectedExtras,
       totalPrice: this.totalPrice,
@@ -159,4 +224,7 @@ export class BookingComponent implements OnInit {
     // this.router.navigate(['/payment'], { state: { booking: bookingDetails } });
   }
   
+  onExtraCheckboxChange(event: any, extraCtrl: any) {
+    extraCtrl.get('quantity').setValue(event.checked ? 1 : 0);
+  }
 }

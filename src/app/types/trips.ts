@@ -2,18 +2,25 @@ export interface TripSearchRequest {
   tripType: string;
   source: string;
   destination: string;
-  departureDate: string;
-  returnDate?: string;
+  departureDate: Date;
+  returnDate?: Date;
 }
 
 export interface Trip {
-  id: number;
+  id: string;
   source: string;
   destination: string;
-  departureDate: string;
+  departureDate: Date;
   departureTime: string;
   arrivalTime: string;
   duration: string;
-  transportationType: string;
+  transportationType: TransportationType;
   price: number;
+}
+
+export enum TransportationType {
+  Flight = 'Flight',
+  Train = 'Train',
+  Bus = 'Bus',
+  Car = 'Car',
 }

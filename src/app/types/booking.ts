@@ -1,14 +1,23 @@
+import { DocumentReference } from "@angular/fire/firestore";
+import { Trip, TransportationType } from "./trips";
+
 export interface Booking {
     userid: string;
-    tripid: number;
+    tripid: DocumentReference<Trip>;
     numberOfSeats: number;
-    selectedExtras: string[];
+    selectedExtras: SelectedExtras[];
     totalPrice: number;
 }
 
 export interface TripExtra {
-    extrasId: number;
+    extrasId: string;
     extrasName: string;
-    extrasquantity: number;
     extrasPrice: number;
+    isQuantifiable: boolean;
+    transportationType: TransportationType[];
+}
+
+export interface SelectedExtras {
+    extrasId: DocumentReference<TripExtra>;
+    quantity?: number;
 }
