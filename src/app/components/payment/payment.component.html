@@ -35,86 +35,9 @@
       </button>
     </div>
 
-    <!-- Success State -->
-    <div
-      *ngIf="!isLoading && booking && isPaymentSuccessful"
-      class="w-full max-w-4xl"
-    >
-      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
-        <div class="flex items-center justify-center mb-6">
-          <mat-icon class="text-6xl text-green-500 mr-4">check_circle</mat-icon>
-          <h2 class="text-3xl text-green-500 font-semibold">
-            Payment Successful!
-          </h2>
-        </div>
-
-        <!-- Card Details -->
-        <div class="bg-white/20 rounded-lg p-6 mb-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-xl text-amber-300 font-semibold">
-              Payment Details
-            </h3>
-            <img
-              [src]="cardImage"
-              [alt]="cardType"
-              class="h-12 object-contain"
-            />
-          </div>
-          <div class="space-y-4">
-            <div>
-              <div class="text-gray-300 text-sm uppercase">Card Number</div>
-              <div class="text-2xl text-white font-mono">
-                {{ maskedCardNumber }}
-              </div>
-            </div>
-            <div>
-              <div class="text-gray-300 text-sm uppercase">Card Holder</div>
-              <div class="text-xl text-white">{{ cardHolderName }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Booking Summary -->
-        <div class="bg-white/20 rounded-lg p-6">
-          <h3 class="text-xl text-amber-300 font-semibold mb-4">
-            Booking Summary
-          </h3>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <div class="text-gray-300 text-sm uppercase">Trip ID</div>
-              <div class="text-xl text-white font-semibold">
-                {{ booking.tripid }}
-              </div>
-            </div>
-            <div>
-              <div class="text-gray-300 text-sm uppercase">Total Price</div>
-              <div class="text-xl text-white font-semibold">
-                {{ booking.totalPrice | currency : "EGP" }}
-              </div>
-            </div>
-            <div>
-              <div class="text-gray-300 text-sm uppercase">Number of Seats</div>
-              <div class="text-xl text-white font-semibold">
-                {{ booking.numberOfSeats }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payment Form -->
-    <form
-      *ngIf="!isLoading && booking && !isPaymentSuccessful"
-      [formGroup]="paymentForm"
-      (ngSubmit)="onSubmit()"
-      class="w-full max-w-4xl"
-    >
-      <!-- Trip Details Section -->
-      <div
-        *ngIf="trip"
-        class="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8"
-      >
+    <!-- Trip Details Section - Show in all cases -->
+    <div *ngIf="!isLoading && trip" class="w-full max-w-4xl mb-8">
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8">
         <h2 class="text-2xl text-amber-300 font-semibold mb-6">Trip Details</h2>
 
         <!-- Route Information -->
@@ -168,7 +91,7 @@
           <div>
             <div class="text-gray-300 text-sm uppercase">Date</div>
             <div class="text-xl text-white">
-              {{ trip.departureDate | date : "mediumDate" }}
+              {{ trip?.departureDate | date : "mediumDate" }}
             </div>
           </div>
         </div>
@@ -208,7 +131,7 @@
                 class="flex justify-between items-center"
               >
                 <span class="text-white">{{
-                  extra?.name || "Extra Service"
+                  tripExtrasIdNameMap.get(extra.extrasId) || "Extra Service"
                 }}</span>
                 <span class="text-amber-300">x{{ extra?.quantity || 0 }}</span>
               </div>
@@ -233,9 +156,10 @@
                 class="flex justify-between items-center text-sm"
               >
                 <span class="text-gray-400"
-                  >{{ extra?.name || "Extra Service" }} x{{
-                    extra?.quantity || 0
-                  }}</span
+                  >{{
+                    tripExtrasIdNameMap.get(extra.extrasId) || "Extra Service"
+                  }}
+                  x{{ extra?.quantity || 0 }}</span
                 >
                 <span class="text-white">{{
                   (extra?.price || 0) * (extra?.quantity || 0)
@@ -254,7 +178,78 @@
           </div>
         </div>
       </div>
+    </div>
 
+    <!-- Success State -->
+    <div
+      *ngIf="!isLoading && booking && isPaymentSuccessful"
+      class="w-full max-w-4xl"
+    >
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
+        <!-- Success Message -->
+        <div
+          *ngIf="booking.status === 'success'"
+          class="flex items-center justify-center mb-6"
+        >
+          <mat-icon class="text-6xl text-green-500 mr-4">check_circle</mat-icon>
+          <h2 class="text-3xl text-green-500 font-semibold">
+            Payment Successful!
+          </h2>
+        </div>
+
+        <!-- Refunded Status -->
+        <div
+          *ngIf="booking.status === 'refunded'"
+          class="flex items-center justify-center mb-6"
+        >
+          <mat-icon class="text-6xl text-amber-400 mr-4"
+            >currency_exchange</mat-icon
+          >
+          <div>
+            <h2 class="text-3xl text-amber-400 font-semibold">
+              Payment Refunded
+            </h2>
+            <p class="text-gray-300 mt-2">
+              This payment has been refunded to your account
+            </p>
+          </div>
+        </div>
+
+        <!-- Card Details -->
+        <div class="bg-white/20 rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl text-amber-300 font-semibold">
+              Payment Details
+            </h3>
+            <img
+              [src]="cardImage"
+              [alt]="cardType"
+              class="h-12 object-contain"
+            />
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-gray-300 text-sm uppercase">Card Number</div>
+              <div class="text-2xl text-white font-mono">
+                {{ maskedCardNumber }}
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-300 text-sm uppercase">Card Holder</div>
+              <div class="text-xl text-white">{{ cardHolderName }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Form -->
+    <form
+      *ngIf="!isLoading && booking && !isPaymentSuccessful"
+      [formGroup]="paymentForm"
+      (ngSubmit)="onSubmit()"
+      class="w-full max-w-4xl"
+    >
       <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8">
         <div class="flex items-center justify-between mb-8">
           <h2 class="text-2xl text-amber-300 font-semibold">Card Details</h2>

@@ -268,8 +268,11 @@ export class BookingComponent implements OnInit {
       tripid: booking.tripid.id,
       numberOfSeats: booking.numberOfSeats,
       selectedExtras: booking.selectedExtras.map((extra) => ({
-        extrasId: extra.extrasId.id,
+        extrasId: extra.extrasId,
         quantity: extra.quantity,
+        price: this.tripExtras.find(
+          (e) => e.extrasId === String(extra.extrasId)
+        )?.extrasPrice,
       })),
       selectedSeats: booking.selectedSeats,
       totalPrice: booking.totalPrice,

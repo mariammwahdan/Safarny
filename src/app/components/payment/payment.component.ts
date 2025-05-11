@@ -30,6 +30,9 @@ import {
   CardType,
 } from '../../core/utils/card.utils';
 import { OtpDialogComponent } from '../otp-dialog/otp-dialog.component';
+import { Timestamp } from '@angular/fire/firestore';
+import { TripExtrasService } from '../../core/services/trip-extras.service';
+import { TripExtra } from '../../types/booking';
 
 interface BookingData {
   userid: string;
@@ -43,6 +46,7 @@ interface BookingData {
   }>;
   selectedSeats: string[];
   totalPrice: number;
+  status?: 'success' | 'failed' | 'refunded' | 'pending';
 }
 
 @Component({
@@ -75,6 +79,8 @@ export class PaymentComponent implements OnInit {
   isPaymentSuccessful: boolean = false;
   maskedCardNumber: string = '';
   cardHolderName: string = '';
+  tripExtrasIdNameMap: Map<string, string> = new Map();
+  private navigationState: any;
 
   constructor(
     private router: Router,
@@ -84,7 +90,8 @@ export class PaymentComponent implements OnInit {
     private tripService: TripService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private extrasService: TripExtrasService
   ) {
     this.paymentForm = this.fb.group({
       cardNumber: [
@@ -101,6 +108,12 @@ export class PaymentComponent implements OnInit {
       ],
       cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
     });
+
+    // Get navigation state in constructor
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation?.extras?.state) {
+      this.navigationState = navigation.extras.state;
+    }
   }
 
   async ngOnInit() {
@@ -112,8 +125,8 @@ export class PaymentComponent implements OnInit {
       if (this.isRetryMode) {
         await this.loadBookingDetails();
       } else {
-        const state = history.state;
-        const bookingData = state?.['booking'] as BookingData;
+        const bookingData = this.navigationState?.['booking'] as BookingData;
+        console.log('Booking data:', bookingData);
 
         if (!bookingData) {
           console.error('No booking data found in state');
@@ -133,6 +146,7 @@ export class PaymentComponent implements OnInit {
         }
 
         this.booking = bookingData;
+        await this.loadTripDetails();
       }
     } catch (error) {
       console.error('Error in ngOnInit:', error);
@@ -157,10 +171,17 @@ export class PaymentComponent implements OnInit {
 
     try {
       this.trip = await this.tripService.getTripById(this.booking.tripid);
+      if (this.trip?.departureDate instanceof Timestamp) {
+        this.trip.departureDate = this.trip.departureDate.toDate();
+      }
     } catch (error) {
       console.error('Error loading trip details:', error);
       this.showError('Error loading trip details. Please try again.');
     }
+    const extras = await this.extrasService.getAllExtras();
+    this.tripExtrasIdNameMap = new Map(
+      extras.map((extra) => [extra.extrasId, extra.extrasName])
+    );
   }
 
   async loadBookingDetails() {
@@ -179,7 +200,8 @@ export class PaymentComponent implements OnInit {
         return;
       }
 
-      if (booking.status === 'success') {
+      // Set payment successful for both success and refunded statuses
+      if (booking.status === 'success' || booking.status === 'refunded') {
         this.isPaymentSuccessful = true;
         if (booking.paymentDetails) {
           this.cardType = getCardType(booking.paymentDetails.cardNumber);
@@ -203,9 +225,10 @@ export class PaymentComponent implements OnInit {
         })),
         selectedSeats: booking.selectedSeats,
         totalPrice: booking.totalPrice,
+        status: booking.status,
       };
-      // Load trip details first
-      console.log('Loading trip details first', this.trip);
+
+      // Load trip details after setting booking data
       await this.loadTripDetails();
     } catch (error) {
       console.error('Error loading booking details:', error);
