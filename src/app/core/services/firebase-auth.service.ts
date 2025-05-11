@@ -78,19 +78,23 @@ export class FirebaseAuthService {
   async getAllUsers(): Promise<User[]> {
     const usersCollection = collection(this.firestore, 'users');
     const usersSnapshot = await getDocs(usersCollection);
-    return usersSnapshot.docs.map(doc => {
+    const users: User[] = [];
+    
+    usersSnapshot.forEach(doc => {
       const data = doc.data();
-      return {
+      users.push({
         uid: doc.id,
-        firstname: data['firstname'] || null,
-        lastname: data['lastname'] || null,
-        email: data['email'] || null,
-        phone: data['phone'] || null,
-        birthDate: data['birthDate'] || null,
-        gender: data['gender'] || null,
+        firstname: data['firstname'] || '',
+        lastname: data['lastname'] || '',
+        email: data['email'] || '',
+        phone: data['phone'] || '',
+        gender: data['gender'] || '',
+        birthDate: data['birthDate'] || '',
         role: data['role'] || 'user'
-      } as User;
+      });
     });
+    
+    return users;
   }
 
   async deleteUser(uid: string): Promise<void> {
