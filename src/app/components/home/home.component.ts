@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button'
 import {MatDividerModule} from '@angular/material/divider';
 import { CarouselModule } from 'ngx-owl-carousel-o'
 import { OwlOptions } from 'ngx-owl-carousel-o'
-
+import { Router } from '@angular/router';
 
 
 
@@ -26,7 +26,10 @@ import { OwlOptions } from 'ngx-owl-carousel-o'
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
+
+
 export class HomeComponent {
+  constructor(private router: Router) {}
 
   isScrolled = false
 
@@ -60,6 +63,10 @@ export class HomeComponent {
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.isScrolled = window.pageYOffset > 50
+  }
+
+  goToTrips() {
+    this.router.navigate(['/trips']);
   }
 
 }
