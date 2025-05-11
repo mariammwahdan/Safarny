@@ -1,11 +1,12 @@
 export interface User {
   uid?: string;
-  firstname: string;
-  lastname: string;
-  email?: string;
-  phone: string;
-  gender?: string;
-  birthDate?: string;
+  firstname: string | null;
+  lastname: string | null;
+  email?: string | null;
+  phone: string | null;
+  gender?: string | null;
+  birthDate?: string | null;
   password?: string;
   confirmPassword?: string;
+  role?: string;
 }

@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,8 @@ export class LoginComponent {
   constructor(
     private fb: FormBuilder, 
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private firebaseAuth: FirebaseAuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required]],
@@ -53,16 +55,18 @@ export class LoginComponent {
       try {
         const { email, password } = this.loginForm.value;
         
-        // Check for admin credentials
-        if (email === 'admin@safarny.com' && password === 'admin') {
-          this.onClose();
+        const userCredential = await this.authService.login(this.loginForm.value);
+        const userData = await this.firebaseAuth.getUserData(userCredential.user.uid);
+        
+        localStorage.setItem('userRole', userData?.role || 'user');
+        
+        if (userData?.role === 'admin') {
+          console.log('Admin login successful!');
           this.router.navigate(['/dashboard']);
-          return;
+        } else {
+          console.log('User login successful!');
         }
         
-        // Regular user login
-        await this.authService.login(this.loginForm.value);
-        console.log('Login successful!');
         this.onClose();
       } catch (err: any) {
         console.error('Login failed:', err);

@@ -15,8 +15,8 @@ import { CommonModule } from '@angular/common';
         <p class="user-info">User: {{ data.userName }}</p>
       </mat-dialog-content>
       <mat-dialog-actions align="end">
-        <button mat-button (click)="onCancel()">Cancel</button>
-        <button mat-raised-button color="warn" (click)="onConfirm()">Delete</button>
+        <div class="cancel-btn" (click)="onCancel()">Cancel</div>
+        <div class="delete-btn" (click)="onConfirm()">Delete</div>
       </mat-dialog-actions>
     </div>
   `,
@@ -32,8 +32,39 @@ import { CommonModule } from '@angular/common';
     mat-dialog-actions {
       margin-top: 20px;
     }
-    button {
+    .cancel-btn {
+      border-radius: 8px;
+      padding: 0 20px;
+      height: 40px;
+      font-weight: 500;
+      background: none;
+      border: none;
+      color: #6b7280;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .cancel-btn:hover {
+      background-color: #f3f4f6;
+    }
+    .delete-btn {
+      border-radius: 8px;
+      padding: 0 20px;
+      height: 40px;
+      font-weight: 500;
       margin-left: 10px;
+      background-color: #ef4444;
+      color: white;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .delete-btn:hover {
+      background-color: #dc2626;
     }
   `]
 })

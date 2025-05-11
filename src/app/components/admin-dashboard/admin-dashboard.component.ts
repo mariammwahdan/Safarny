@@ -3,15 +3,15 @@ import { AuthService } from '../../core/services/auth.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Auth } from '@angular/fire/auth';
 import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
-import { UserManagementService } from '../../core/services/user-management.service';
 import { User } from '../../types/user';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
+import { EditUserDialogComponent } from '../../shared/edit-user-dialog/edit-user-dialog.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -29,18 +29,18 @@ import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/co
 })
 export class AdminDashboardComponent implements OnInit, OnDestroy {
   username: string = 'Admin User';
-  selectedMenu = 'dashboard';
+  selectedMenu = 'users';
   showDropdown = false;
   users: User[] = [];
+  selectedUser: User | null = null;
   displayedColumns: string[] = ['firstname', 'lastname', 'email', 'phone', 'actions'];
 
   constructor(
     public _Nav: AuthService,
     private router: Router,
-    private auth: Auth,
     private firebaseAuth: FirebaseAuthService,
-    private userManagementService: UserManagementService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -59,10 +59,39 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   async loadUsers() {
     try {
-      this.users = await this.userManagementService.getAllUsers();
+      const allUsers = await this.firebaseAuth.getAllUsers();
+      this.users = allUsers.filter(user => user.role !== 'admin');
     } catch (error) {
       console.error('Error loading users:', error);
+      this.notificationService.showError('Failed to load users');
     }
+  }
+
+  openEditDialog(user: User) {
+    const dialogRef = this.dialog.open(EditUserDialogComponent, {
+      width: '500px',
+      data: { user }
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        if (result.action === 'delete') {
+          await this.deleteUser(result.user);
+        } else {
+          try {
+            await this.firebaseAuth.updateUserData(result.uid!, result);
+            await this.loadUsers();
+            this.notificationService.showUpdateSuccess();
+            if (this.selectedUser && this.selectedUser.uid === result.uid) {
+              this.selectedUser = result;
+            }
+          } catch (error) {
+            console.error('Error updating user:', error);
+            this.notificationService.showError('Failed to update user');
+          }
+        }
+      }
+    });
   }
 
   async deleteUser(user: User) {
@@ -79,13 +108,20 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(async (result) => {
       if (result) {
         try {
-          await this.userManagementService.deleteUser(user.uid!);
-          await this.loadUsers(); // Reload the users list
+          await this.firebaseAuth.deleteUser(user.uid!);
+          await this.loadUsers();
+          this.notificationService.showDeleteSuccess();
         } catch (error) {
           console.error('Error deleting user:', error);
+          this.notificationService.showError('Failed to delete user');
         }
       }
     });
+  }
+
+  selectUser(user: User) {
+    this.selectedUser = user;
+    this.selectedMenu = 'bookings';
   }
 
   selectMenu(menu: string) {

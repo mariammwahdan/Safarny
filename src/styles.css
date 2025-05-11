@@ -1,3 +1,55 @@
-
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Update notification styles */
+.update-snackbar .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+/* Delete notification styles */
+.delete-snackbar .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+/* Error notification styles */
+.error-snackbar .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+/* Common styles for all notifications */
+.mdc-snackbar__label {
+  color: white !important;
+}
+
+.update-snackbar,
+.error-snackbar {
+  background: #10b981 !important;
+  color: white !important;
+}
+
+.red-snackbar {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+.update-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface,
+.error-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+.delete-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface,
+.red-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+.mat-mdc-snack-bar-container.red-snackbar .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+.success-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
+
+.error-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}

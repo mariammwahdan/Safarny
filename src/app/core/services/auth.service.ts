@@ -30,9 +30,8 @@ export class AuthService {
   //   this.isAuthenticated.next(true);
   // }
 
-  async login(credentials: { email: string; password: string }): Promise<void> {
+  async login(credentials: { email: string; password: string }): Promise<any> {
     try {
-
       const userCred = await this.firebaseAuth.login(
         credentials.email,
         credentials.password
@@ -42,6 +41,7 @@ export class AuthService {
       const uid = userCred.user.uid;
       await this.firebaseAuth.getUserData(uid);
       this.isAuthenticated.next(true);
+      return userCred;
     } catch (err: unknown) {
       const error = err as FirebaseError;
       console.error('Firebase login error:', error);
