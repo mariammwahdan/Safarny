@@ -18,3 +18,56 @@
   width: 24px;
   height: 24px;
 }
+
+/* Update notification styles */
+::ng-deep .update-snackbar .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+/* Delete notification styles */
+::ng-deep .delete-snackbar .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+/* Error notification styles */
+::ng-deep .error-snackbar .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+/* Common styles for all notifications */
+::ng-deep .mdc-snackbar__label {
+  color: white !important;
+}
+
+::ng-deep .update-snackbar,
+::ng-deep .error-snackbar {
+  background: #10b981 !important;
+  color: white !important;
+}
+
+::ng-deep .red-snackbar {
+  background: #ef4444 !important;
+  color: white !important;
+}
+
+::ng-deep .update-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface,
+::ng-deep .error-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #10b981 !important;
+}
+
+::ng-deep .delete-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface,
+::ng-deep .red-snackbar .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+::ng-deep .mat-mdc-snack-bar-container.red-snackbar .mdc-snackbar__surface {
+  background-color: #ef4444 !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}

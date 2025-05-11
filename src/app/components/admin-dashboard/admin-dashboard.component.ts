@@ -3,6 +3,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { Auth } from '@angular/fire/auth';
 import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
 import { User } from '../../types/user';
 import { MatTableModule } from '@angular/material/table';
@@ -38,6 +39,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   constructor(
     public _Nav: AuthService,
     private router: Router,
+    private auth: Auth,
     private firebaseAuth: FirebaseAuthService,
     private dialog: MatDialog,
     private notificationService: NotificationService
