@@ -6,8 +6,13 @@ import {
   setDoc,
   getDoc,
   updateDoc,
+  query,
+  where,
+  getDocs,
+  orderBy,
 } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
+import { FirebaseAuthService } from './firebase-auth.service';
 
 export interface PaymentDetails {
   cardNumber: string;
@@ -27,7 +32,7 @@ export interface BookingRecord {
   }>;
   selectedSeats: string[];
   totalPrice: number;
-  status: 'pending' | 'success' | 'failed';
+  status: 'pending' | 'success' | 'failed' | 'refunded';
   paymentDetails?: PaymentDetails;
   createdAt: Date;
   updatedAt: Date;
@@ -39,7 +44,11 @@ export interface BookingRecord {
 export class PaymentService {
   private readonly BOOKINGS_COLLECTION = 'bookings';
 
-  constructor(private firestore: Firestore, private router: Router) {}
+  constructor(
+    private firestore: Firestore,
+    private router: Router,
+    private authService: FirebaseAuthService
+  ) {}
 
   async processPayment(
     paymentDetails: PaymentDetails,
@@ -121,5 +130,27 @@ export class PaymentService {
       isSuccessful ? 'success' : 'failed'
     );
     return isSuccessful;
+  }
+
+  async getUserBookings(userId: string): Promise<BookingRecord[]> {
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+
+    const bookingsRef = collection(this.firestore, this.BOOKINGS_COLLECTION);
+    const q = query(
+      bookingsRef,
+      where('userid', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data(),
+        } as BookingRecord)
+    );
   }
 }

@@ -262,7 +262,6 @@ export class BookingComponent implements OnInit {
     };
 
     console.log('Booking details:', booking);
-    alert('Booking confirmed! 🎉');
 
     const plainBooking = {
       userid: booking.userid,
