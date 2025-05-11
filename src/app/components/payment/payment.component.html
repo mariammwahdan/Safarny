@@ -1,0 +1,55 @@
+<mat-card
+  class="p-6 shadow-xl rounded-xl relative overflow-hidden"
+  style="
+    background-image: url('payment.jpg');
+    background-size: cover;
+    background-position: center;
+  "
+>
+  <!-- Overlay with just black opacity -->
+  <div class="absolute inset-0 bg-black/50"></div>
+
+  <!-- Content container with z-index to appear above the overlay -->
+  <div class="flex flex-col items-center relative z-10">
+    <div class="pt-8 mb-4"></div>
+    <h1 class="text-4xl text-amber-300 font-bold mb-8">Payment</h1>
+  </div>
+
+  <div class="flex flex-col md:flex-row justify-between w-full mb-8">
+    <div class="flex-1 mb-4 md:mb-0">
+      <div class="text-base text-gray-300 uppercase font-medium">Trip ID</div>
+      <div class="text-3xl font-bold text-orange-300">
+        {{ booking.tripid }}
+      </div>
+    </div>
+
+    <div class="flex-1 mb-4 md:mb-0">
+      <div class="text-base text-gray-300 uppercase font-medium">totalPrice</div>
+      <div class="text-3xl font-bold text-orange-300">
+        {{ booking.totalPrice | currency: 'EGP' }}
+      </div>
+    </div>  
+
+    <div class="flex-1 mb-4 md:mb-0">
+      <div class="text-base text-gray-300 uppercase font-medium">Number of Seats</div>
+      <div class="text-3xl font-bold text-orange-300">
+        {{ booking.numberOfSeats }}
+      </div>
+    </div>  
+    
+
+
+
+  </div>
+</mat-card>
+    <!-- const plainBooking = { -->
+      <!-- userid: booking.userid, -->
+      <!-- tripid: booking.tripid.id, -->
+      <!-- numberOfSeats: booking.numberOfSeats, -->
+      <!-- selectedExtras: booking.selectedExtras.map((extra) => ({ -->
+        <!-- extrasId: extra.extrasId.id, -->
+        <!-- quantity: extra.quantity, -->
+      <!-- })), -->
+      <!-- selectedSeats: booking.selectedSeats, -->
+      <!-- totalPrice: booking.totalPrice, -->
+    <!-- }; -->
