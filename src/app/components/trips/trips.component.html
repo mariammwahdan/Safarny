@@ -1,17 +1,17 @@
 <img src="trips.jpg" alt="Trips" class="w-full h-3/5 object-cover">
 
-
-<div class="absolute left-1/2 transform -translate-x-1/2 top-2/5 w-11/12 md:w-3/4 lg:w-2/3">
-    <mat-card class="p-4 shadow-lg bg-white bg-opacity-95 backdrop-blur-sm rounded-xl border border-gray-100">
-        <form [formGroup]="tripForm" class="grid grid-cols-5 gap-3 items-center p-2">
-            <div class="col-span-5 flex justify-center items-center mb-1">
+<div class="absolute left-1/2 transform -translate-x-1/2 top-2/5 w-11/12 md:w-3/4 lg:w-2/3 animate-fadeIn">
+    <mat-card
+        class="p-4 shadow-lg bg-white bg-opacity-95 backdrop-blur-sm rounded-xl border border-gray-100 card-animation">
+        <form [formGroup]="tripForm" class="grid grid-cols-1 md:grid-cols-5 gap-3 items-center p-2">
+            <div class="col-span-1 md:col-span-5 flex justify-center items-center mb-1">
                 <mat-radio-group formControlName="tripType" class="flex space-x-6">
                     <mat-radio-button value="one-way" class="text-blue-800">One Way</mat-radio-button>
                     <mat-radio-button value="round-trip" class="text-blue-800">Round Trip</mat-radio-button>
                 </mat-radio-group>
             </div>
 
-            <div class="col-span-2 space-y-2">
+            <div class="col-span-1 md:col-span-2 space-y-2">
                 <label class="block font-semibold text-sm text-blue-900">Starting point:</label>
                 <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
                     <mat-select formControlName="source" placeholder="Choose your starting location">
@@ -28,7 +28,7 @@
                 </mat-form-field>
             </div>
 
-            <div class="flex justify-center items-center text-2xl col-span-1">
+            <div class="hidden md:flex justify-center items-center text-2xl col-span-1">
                 <div class="bg-blue-100 p-2 rounded-full">
                     <ng-container *ngIf="tripForm.get('tripType')?.value === 'round-trip'; else oneWayIcon">
                         <mat-icon class="text-blue-700">swap_horiz</mat-icon>
@@ -39,7 +39,7 @@
                 </div>
             </div>
 
-            <div class="col-span-2 space-y-2">
+            <div class="col-span-1 md:col-span-2 space-y-2">
                 <label class="block font-semibold text-sm text-blue-900">Destination:</label>
                 <mat-form-field appearance="outline" class="w-full custom-form-field compact-form-field">
                     <mat-select formControlName="destination" placeholder="Choose your destination">
@@ -57,10 +57,10 @@
                 </mat-form-field>
             </div>
 
-            <div class="col-span-5 flex justify-center mt-2">
+            <div class="col-span-1 md:col-span-5 flex justify-center mt-2">
                 <button mat-flat-button color="primary" type="button" (click)="searchTrips()"
                     [disabled]="!tripForm.valid"
-                    class="px-8 py-2 w-auto rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md"
+                    class="px-8 py-2 w-auto rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md btn-pulse"
                     [ngClass]="{'bg-gray-400 hover:bg-gray-400 cursor-not-allowed': !tripForm.valid}">
                     <mat-icon class="mr-2">search</mat-icon> Search Trips
                 </button>
@@ -71,31 +71,34 @@
 
 <div class="h-1/4" style="min-height: 200px; max-height: 300px;"></div>
 
-<div *ngIf="filteredTrips.length > 0 && !isLoadingTrips" class="container mx-auto px-4 py-8 w-11/12 md:w-2/3"
-    #resultsSection>
-    <div class="flex justify-between items-center mb-6">
-        <h2 class="text-2xl font-bold">Available trips</h2>
-        <div>
-            <mat-label class="text-sm font-medium mr-2 inline-block py-2">Filter by Transportation:</mat-label>
-            <mat-form-field appearance="outline" class="w-48">
-                <mat-select [(ngModel)]="selectedTransportation">
-                    <mat-option [value]="null">All</mat-option>
-                    <mat-option [value]="TransportationType.Flight">Flight</mat-option>
-                    <mat-option [value]="TransportationType.Train">Train</mat-option>
-                    <mat-option [value]="TransportationType.Bus">Bus</mat-option>
-                    <mat-option [value]="TransportationType.Car">Car</mat-option>
-                </mat-select>
-            </mat-form-field>
+<div *ngIf="filteredTrips.length > 0 && !isLoadingTrips"
+    class="container mx-auto px-4 py-8 w-11/12 md:w-2/3 results-container" #resultsSection>
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 animate-slideFromTop">
+        <h2 class="text-2xl font-bold mb-3 md:mb-0">Available trips</h2>
+        <div class="filter-wrapper flex items-center">
+            <mat-icon class="text-gray-700 transform scale-75 mr-1">filter_list</mat-icon>
+            <span class="text-sm mr-2 text-gray-700 font-medium">Filter:</span>
+            <div class="w-40 simple-select">
+                <select [(ngModel)]="selectedTransportation" (ngModelChange)="filterTrips()"
+                    class="w-full bg-white border border-gray-300 rounded py-1 px-2 text-sm">
+                    <option [ngValue]="null">Transportation</option>
+                    <option [ngValue]="TransportationType.Flight">Flight</option>
+                    <option [ngValue]="TransportationType.Train">Train</option>
+                    <option [ngValue]="TransportationType.Bus">Bus</option>
+                    <option [ngValue]="TransportationType.Car">Car</option>
+                </select>
+            </div>
         </div>
     </div>
 
     <div class="space-y-6">
-        <mat-card *ngFor="let trip of filteredTrips" class="p-6 rounded-lg bg-white border border-gray-200 shadow-md">
+        <mat-card *ngFor="let trip of filteredTrips; let i = index"
+            class="p-6 rounded-lg bg-white border border-blue-100 shadow-md trip-card"
+            [ngStyle]="{'animation-delay': (i * 0.1) + 's'}">
 
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
 
-            <div class="flex items-center justify-between">
-
-                <div class="flex-1">
+                <div class="flex-1 mb-4 md:mb-0">
                     <div class="flex justify-start text-xs text-gray-500 uppercase">
                         <span>{{ trip.source }}</span>
                         <span class="mx-2 w-54"></span>
@@ -108,12 +111,11 @@
                             {{ trip.departureTime }}
                         </div>
 
-
-                        <div class="flex items-center mx-4">
-                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            <span class="w-16 h-px bg-gray-400"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            <span class="text-gray-400 text-xl mx-2">
+                        <div class="flex items-center mx-4 route-animation">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span class="w-16 h-px bg-blue-400"></span>
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span class="text-blue-500 text-xl mx-2">
                                 <ng-container [ngSwitch]="trip.transportationType">
                                     <mat-icon *ngSwitchCase="TransportationType.Flight">flight</mat-icon>
                                     <mat-icon *ngSwitchCase="TransportationType.Train">train</mat-icon>
@@ -121,11 +123,10 @@
                                     <mat-icon *ngSwitchCase="TransportationType.Car">commute</mat-icon>
                                 </ng-container>
                             </span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
-                            <span class="w-16 h-px bg-gray-400"></span>
-                            <span class="w-2 h-2 bg-gray-400 rounded-full"></span>
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                            <span class="w-16 h-px bg-blue-400"></span>
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
                         </div>
-
 
                         <div class="text-xl font-bold">
                             {{ trip.arrivalTime }}
@@ -133,19 +134,20 @@
                     </div>
                 </div>
 
-
-                <div class="flex items-center space-x-8 px-6">
-                    <div class="text-center">
+                <div
+                    class="flex flex-wrap md:flex-nowrap items-center justify-between md:justify-end w-full md:w-auto space-y-4 md:space-y-0 md:space-x-8 px-0 md:px-6">
+                    <div class="text-center w-1/2 md:w-auto">
                         <div class="text-sm text-gray-500">Guest</div>
                         <div class="text-lg font-bold">{{ trip.price }} EGP</div>
                     </div>
 
-                    <div class="text-center capitalize">
+                    <div class="text-center capitalize w-1/2 md:w-auto">
                         <div class="text-sm text-gray-500">Transportation</div>
                         <div class="text-lg font-semibold">{{ trip.transportationType }}</div>
                     </div>
 
-                    <button mat-flat-button color="primary" class="px-6 ml-4" (click)="bookTrip(trip)">
+                    <button mat-flat-button color="primary" class="w-full md:w-auto px-6 mt-4 md:mt-0 md:ml-4"
+                        (click)="bookTrip(trip)">
                         Book ticket
                     </button>
                 </div>
@@ -153,11 +155,20 @@
         </mat-card>
     </div>
 </div>
-<div *ngIf="isLoadingTrips" class="flex justify-center items-center h-screen">
+
+<div *ngIf="isLoadingTrips" class="flex justify-center items-center h-64 animate-pulse">
     <mat-spinner></mat-spinner>
 </div>
+
 <div *ngIf="filteredTrips.length === 0 && searchPerformed && !isLoadingTrips"
-    class="container mx-auto px-4 py-8 w-11/12 md:w-2/3">
-    <h2 class="text-2xl font-bold text-center">No trips found</h2>
-    <p class="text-gray-500 text-center">Please adjust your search criteria.</p>
+    class="container mx-auto px-4 py-8 w-11/12 md:w-2/3 empty-state-animation">
+    <div class="text-center p-8 bg-white rounded-lg shadow-md border border-blue-100">
+        <mat-icon class="text-5xl text-blue-300 mb-4">search_off</mat-icon>
+        <h2 class="text-2xl font-bold text-center mb-2">No trips found</h2>
+        <p class="text-gray-500 text-center mb-6">Please adjust your search criteria.</p>
+        <button mat-flat-button color="primary" type="button" (click)="resetSearch()"
+            class="px-6 py-2 rounded-full text-white bg-blue-700 hover:bg-blue-800 shadow-md">
+            <mat-icon class="mr-2">refresh</mat-icon> Reset Search
+        </button>
+    </div>
 </div>

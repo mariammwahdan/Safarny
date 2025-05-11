@@ -1,0 +1,153 @@
+<div class="about-us-container">
+    <div class="hero-section">
+        <div class="overlay">
+            <h1>About Safarny</h1>
+            <p class="tagline">Your Trusted Partner for Memorable Travel Experiences</p>
+        </div>
+    </div>
+
+    <div class="content-container">
+        <!-- Our Story Section -->
+        <mat-card class="section-card animate-on-scroll">
+            <div class="card-content">
+                <div class="section-title">
+                    <mat-icon class="section-icon">history</mat-icon>
+                    <h2>Our Story</h2>
+                </div>
+                <mat-divider></mat-divider>
+                <p>
+                    Founded in 2023, Safarny was born from a passion for simplifying travel for Egyptians.
+                    We recognized the challenges travelers face when booking transportation within our beautiful country
+                    and set out to create a seamless platform that connects passengers with diverse
+                    transportation options.
+                </p>
+                <p>
+                    What started as a small idea has grown into Egypt's preferred travel booking platform,
+                    serving thousands of satisfied customers each month and partnering with the country's
+                    leading transportation providers.
+                </p>
+            </div>
+        </mat-card>
+
+        <!-- Our Mission Section -->
+        <mat-card class="section-card animate-on-scroll">
+            <div class="card-content">
+                <div class="section-title">
+                    <mat-icon class="section-icon">star</mat-icon>
+                    <h2>Our Mission</h2>
+                </div>
+                <mat-divider></mat-divider>
+                <p>
+                    At Safarny, our mission is to revolutionize how Egyptians travel by providing a user-friendly
+                    platform that offers reliable, affordable, and convenient transportation solutions. We strive to:
+                </p>
+                <ul class="mission-list">
+                    <li class="animate-item">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>Connect travelers with the best transportation options across Egypt</span>
+                    </li>
+                    <li class="animate-item">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>Ensure transparent pricing with no hidden fees</span>
+                    </li>
+                    <li class="animate-item">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>Provide exceptional customer service at every step of your journey</span>
+                    </li>
+                    <li class="animate-item">
+                        <mat-icon>check_circle</mat-icon>
+                        <span>Support local transportation providers while maintaining high standards</span>
+                    </li>
+                </ul>
+            </div>
+        </mat-card>
+
+        <!-- Why Choose Us Section -->
+        <mat-card class="section-card animate-on-scroll">
+            <div class="card-content">
+                <div class="section-title">
+                    <mat-icon class="section-icon">thumb_up</mat-icon>
+                    <h2>Why Choose Safarny</h2>
+                </div>
+                <mat-divider></mat-divider>
+                <div class="features-grid">
+                    <div class="feature animate-item">
+                        <div class="feature-icon-wrapper">
+                            <mat-icon>payments</mat-icon>
+                        </div>
+                        <h3>Best Value</h3>
+                        <p>Competitive pricing across all transportation options with seasonal promotions and loyalty
+                            rewards.</p>
+                    </div>
+                    <div class="feature animate-item">
+                        <div class="feature-icon-wrapper">
+                            <mat-icon>verified_user</mat-icon>
+                        </div>
+                        <h3>Reliable Service</h3>
+                        <p>Carefully vetted transportation partners and real-time updates for peace of mind.</p>
+                    </div>
+                    <div class="feature animate-item">
+                        <div class="feature-icon-wrapper">
+                            <mat-icon>touch_app</mat-icon>
+                        </div>
+                        <h3>Easy Booking</h3>
+                        <p>Intuitive platform designed for quick and hassle-free reservations on any device.</p>
+                    </div>
+                    <div class="feature animate-item">
+                        <div class="feature-icon-wrapper">
+                            <mat-icon>support_agent</mat-icon>
+                        </div>
+                        <h3>24/7 Support</h3>
+                        <p>Dedicated customer service team available round-the-clock to assist with any queries.</p>
+                    </div>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Our Team Section -->
+        <mat-card class="section-card animate-on-scroll">
+            <div class="card-content">
+                <div class="section-title">
+                    <mat-icon class="section-icon">groups</mat-icon>
+                    <h2>Meet Our Team</h2>
+                </div>
+                <mat-divider></mat-divider>
+                <p class="team-intro">
+                    Safarny is powered by a diverse team of passionate professionals dedicated to transforming
+                    travel in Egypt. Our talented team combines expertise in technology, customer service,
+                    and local travel knowledge to deliver an exceptional booking experience.
+                </p>
+
+                <div class="carousel-container">
+                    <owl-carousel-o [options]="customOptions" class="team-carousel">
+                        <ng-container *ngFor="let member of teamMembers">
+                            <ng-template carouselSlide>
+                                <div class="team-member animate-item">
+                                    <div class="member-photo">
+                                        <div [ngClass]="member.photo" class="member-photo-image"></div>
+                                        <div class="member-overlay">
+                                            <mat-icon>linkedin</mat-icon>
+                                        </div>
+                                    </div>
+                                    <h3>{{member.name}}</h3>
+                                    <p class="member-title">{{member.title}}</p>
+                                </div>
+                            </ng-template>
+                        </ng-container>
+                    </owl-carousel-o>
+                </div>
+            </div>
+        </mat-card>
+
+        <!-- Contact CTA -->
+        <div class="contact-cta animate-on-scroll">
+            <div class="cta-ripple"></div>
+            <h2>Have Questions?</h2>
+            <p>Our friendly team is here to help with any inquiries you may have about our services.</p>
+            <button mat-raised-button color="primary" routerLink="/contact-us">
+                <span>Contact Us</span>
+                <mat-icon>arrow_forward</mat-icon>
+            </button>
+        </div>
+    </div>
+</div>

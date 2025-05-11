@@ -71,6 +71,7 @@ mat-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 
 /* Styling for the date picker icons */
@@ -84,4 +85,178 @@ mat-card:hover {
   font-size: 24px;
   height: 24px;
   width: 24px;
+}
+
+/* Simple filter styling */
+.filter-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.simple-select select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23666' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2rem;
+  height: 32px;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+}
+
+.simple-select select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+
+.simple-select select option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+/* Animation for fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.8s ease-in-out forwards;
+}
+
+/* Animation for card */
+.card-animation {
+  animation: slideUp 0.6s ease-out forwards;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes slideUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Search button pulse animation */
+.btn-pulse {
+  transition: all 0.3s ease;
+}
+
+.btn-pulse:hover:not(:disabled) {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+/* Trip card animation */
+.trip-card {
+  animation: slideIn 0.5s ease-out forwards;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Results container animation */
+.results-container {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide in animation for section headers */
+.animate-slideFromTop {
+  animation: slideFromTop 0.6s ease-out forwards;
+}
+
+@keyframes slideFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Route animation */
+.route-animation {
+  position: relative;
+}
+
+.route-animation::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: rgba(59, 130, 246, 0.4);
+  animation: lineGrow 1.5s ease-out forwards;
+  z-index: -1;
+}
+
+@keyframes lineGrow {
+  to {
+    width: 100%;
+  }
+}
+
+/* Empty state animation */
+.empty-state-animation {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Media queries for better responsiveness */
+@media (max-width: 768px) {
+  .trip-card {
+    padding: 1rem;
+  }
+  
+  .empty-state-animation {
+    padding: 1rem;
+  }
 }

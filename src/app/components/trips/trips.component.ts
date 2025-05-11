@@ -25,6 +25,7 @@ import { CountryService } from '../../core/services/country.service';
 import { City } from '../../types/city';
 import { finalize } from 'rxjs/operators';
 import { TripService } from '../../core/services/trip.service';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 @Component({
   selector: 'app-trips',
@@ -48,6 +49,14 @@ import { TripService } from '../../core/services/trip.service';
   ],
   templateUrl: './trips.component.html',
   styleUrl: './trips.component.css',
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('600ms ease-out', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
 export class TripsComponent implements OnInit {
   @ViewChild('resultsSection') resultsSection!: ElementRef;
@@ -166,6 +175,22 @@ export class TripsComponent implements OnInit {
   filterTrips() {
     this.filteredTrips = this.availableTrips.filter(trip => {
       return !this.selectedTransportation || trip.transportationType === this.selectedTransportation;
+    });
+  }
+  
+  resetSearch() {
+    this.tripForm.reset({
+      tripType: 'one-way'
+    });
+    this.searchPerformed = false;
+    this.selectedTransportation = null;
+    this.availableTrips = [];
+    this.filteredTrips = [];
+    
+    // Scroll back to top of page
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
     });
   }
 }
