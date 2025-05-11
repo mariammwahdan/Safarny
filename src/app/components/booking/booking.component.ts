@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatDialog } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog'; // <-- Make sure this is imported
+import { SeatSelectionDialogComponent } from '../seat-selection-dialog/seat-selection-dialog.component';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {
   ReactiveFormsModule,
@@ -29,6 +32,7 @@ import { Booking, TripExtra } from '../../types/booking';
 import { FirebaseAuthService } from '../../core/services/firebase-auth.service';
 import { Firestore, doc, DocumentReference } from '@angular/fire/firestore';
 import { LoginComponent } from '../login/login.component';
+import { user } from '@angular/fire/auth';
 
 // Custom validator factory for Comfort Seat
 function maxComfortSeatValidator(getMax: () => number): ValidatorFn {
@@ -46,6 +50,7 @@ function maxComfortSeatValidator(getMax: () => number): ValidatorFn {
   imports: [
     CommonModule,
     // RouterLink,
+
     MatCardModule,
     MatRadioModule,
     ReactiveFormsModule,
@@ -54,6 +59,7 @@ function maxComfortSeatValidator(getMax: () => number): ValidatorFn {
     MatSelectModule,
     MatInputModule,
     MatDatepickerModule,
+    MatDialogModule,
     MatNativeDateModule,
     MatButtonModule,
     MatIconModule,
@@ -71,6 +77,7 @@ export class BookingComponent implements OnInit {
   tripExtras: TripExtra[] = [];
   totalPrice: number = 0;
   backgroundImageUrl = 'booking.png';
+  selectedSeats: string[] = [];
   comfortSeatError: string | null = null;
   @ViewChild(LoginComponent) loginModal!: LoginComponent;
 
@@ -81,6 +88,7 @@ export class BookingComponent implements OnInit {
     private extrasService: TripExtrasService,
     private firebaseAuthService: FirebaseAuthService,
     private firestore: Firestore,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
     const navigation = this.router.getCurrentNavigation();
@@ -107,7 +115,7 @@ export class BookingComponent implements OnInit {
   initForm() {
     this.bookingForm = this.fb.group({
       numberOfSeats: [1, [Validators.required, Validators.min(1)]],
-      selectedExtras: this.fb.array([]), 
+      selectedExtras: this.fb.array([]),
     });
 
     this.bookingForm.get('numberOfSeats')?.valueChanges.subscribe(() => {
@@ -124,10 +132,15 @@ export class BookingComponent implements OnInit {
       if (extra.isQuantifiable) {
         let validators = [Validators.min(0)];
         if (extra.extrasName === 'Comfort Seat') {
-          validators.push(maxComfortSeatValidator(() => this.bookingForm.get('numberOfSeats')?.value || 1));
+          validators.push(
+            maxComfortSeatValidator(
+              () => this.bookingForm.get('numberOfSeats')?.value || 1
+            )
+          );
         }
         extrasFormArray.push(
           this.fb.group({
+            extrasId: [extra.extrasId],
             name: [extra.extrasName],
             quantity: [0, validators],
             price: [extra.extrasPrice],
@@ -136,6 +149,7 @@ export class BookingComponent implements OnInit {
       } else {
         extrasFormArray.push(
           this.fb.group({
+            extrasId: [extra.extrasId],
             name: [extra.extrasName],
             selected: [false],
             price: [extra.extrasPrice],
@@ -157,7 +171,23 @@ export class BookingComponent implements OnInit {
       duration: 5000,
       horizontalPosition: 'center',
       verticalPosition: 'top',
-      panelClass: ['error-snackbar']
+      panelClass: ['error-snackbar'],
+    });
+  }
+
+  openSeatSelection() {
+    const numSeats = this.bookingForm.get('numberOfSeats')?.value || 1;
+
+    const dialogRef = this.dialog.open(SeatSelectionDialogComponent, {
+      width: '600px',
+      data: { numSeats },
+    });
+
+    dialogRef.afterClosed().subscribe((result: string[] | undefined) => {
+      if (result) {
+        this.selectedSeats = result;
+        console.log('Selected seats:', result);
+      }
     });
   }
 
@@ -174,8 +204,12 @@ export class BookingComponent implements OnInit {
         extrasPrice += quantity * price;
 
         // Set error for Comfort Seat if quantity exceeds seats
-        if (this.tripExtras[i].extrasName === 'Comfort Seat' && quantity > seats) {
-          this.comfortSeatError = 'Comfort Seat quantity cannot exceed number of seats';
+        if (
+          this.tripExtras[i].extrasName === 'Comfort Seat' &&
+          quantity > seats
+        ) {
+          this.comfortSeatError =
+            'Comfort Seat quantity cannot exceed number of seats';
         }
       } else {
         const selected = control.get('selected')?.value;
@@ -194,36 +228,56 @@ export class BookingComponent implements OnInit {
       this.loginModal.open();
       return;
     }
-  
+
     const extrasArray = this.bookingForm.get('selectedExtras') as FormArray;
-    const selectedExtras = extrasArray.controls.map((control, i) => {
-      if (this.tripExtras[i].isQuantifiable) {
-        return {
-          extrasId: control.get('extrasId')?.value,
-          quantity: control.get('quantity')?.value
-        };
-      } else {
-        return {
-          extrasId: control.get('extrasId')?.value,
-          quantity: control.get('selected')?.value ? 1 : 0
-        };
-      }
-    }).filter(extra => extra.quantity > 0);
-  
-    const tripRef = doc(this.firestore, 'trips', this.tripId) as DocumentReference<Trip>;
-    const bookingDetails: Booking = {
+    const selectedExtras = extrasArray.controls
+      .map((control, i) => {
+        if (this.tripExtras[i].isQuantifiable) {
+          return {
+            extrasId: control.get('extrasId')?.value,
+            quantity: control.get('quantity')?.value,
+          };
+        } else {
+          return {
+            extrasId: control.get('extrasId')?.value,
+            quantity: control.get('selected')?.value ? 1 : 0,
+          };
+        }
+      })
+      .filter((extra) => extra.quantity > 0);
+
+    const tripRef = doc(
+      this.firestore,
+      'trips',
+      this.tripId
+    ) as DocumentReference<Trip>;
+    const booking: Booking = {
       userid: uid,
       tripid: tripRef,
       numberOfSeats: this.bookingForm.get('numberOfSeats')?.value,
       selectedExtras,
+      selectedSeats: this.selectedSeats,
       totalPrice: this.totalPrice,
     };
-  
-    console.log('Booking details:', bookingDetails);
+
+    console.log('Booking details:', booking);
     alert('Booking confirmed! 🎉');
-    // this.router.navigate(['/payment'], { state: { booking: bookingDetails } });
+
+    const plainBooking = {
+      userid: booking.userid,
+      tripid: booking.tripid.id,
+      numberOfSeats: booking.numberOfSeats,
+      selectedExtras: booking.selectedExtras.map((extra) => ({
+        extrasId: extra.extrasId.id,
+        quantity: extra.quantity,
+      })),
+      selectedSeats: booking.selectedSeats,
+      totalPrice: booking.totalPrice,
+    };
+
+    this.router.navigate(['/payment'], { state: { booking: plainBooking } });
   }
-  
+
   onExtraCheckboxChange(event: any, extraCtrl: any) {
     extraCtrl.get('quantity').setValue(event.checked ? 1 : 0);
   }

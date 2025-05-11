@@ -6,6 +6,7 @@ export interface Booking {
     tripid: DocumentReference<Trip>;
     numberOfSeats: number;
     selectedExtras: SelectedExtras[];
+    selectedSeats: string[];
     totalPrice: number;
 }
 
