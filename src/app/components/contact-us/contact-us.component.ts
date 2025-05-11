@@ -76,8 +76,10 @@ export class ContactUsComponent {
 
   
     if (!this.hasError) {
-      window.location.href = 'after-sending-message.html'; 
+      document.getElementById('thankYouPopup')?.classList.remove('hidden');
     }
+
+    
   }
 
 
@@ -92,6 +94,28 @@ export class ContactUsComponent {
     input.classList.remove('border-red-500');
     error.classList.add('hidden');
   }
+  
+  resetFormAndClosePopup(): void {
+    // hide popup
+    document.getElementById('thankYouPopup')?.classList.add('hidden')
+  
+    // clear each field value
+    this.fields.forEach(id => {
+      const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement
+      if (input) input.value = ''
+    })
+  
+    // clear error styles
+    this.fields.forEach(id => {
+      const input = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement
+      const error = document.getElementById(`${id}-error`)
+      if (input) input.classList.remove('border-red-500')
+      if (error) error.classList.add('hidden')
+    })
+  
+    this.hasError = false
+  }
+  
   
 
 }
