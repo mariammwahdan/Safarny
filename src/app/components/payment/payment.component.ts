@@ -7,6 +7,9 @@ import {
   FormBuilder,
   FormGroup,
   Validators,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
@@ -33,6 +36,38 @@ import { OtpDialogComponent } from '../otp-dialog/otp-dialog.component';
 import { Timestamp } from '@angular/fire/firestore';
 import { TripExtrasService } from '../../core/services/trip-extras.service';
 import { TripExtra } from '../../types/booking';
+
+// Custom validator for expiry date
+function expiryDateValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    if (!value) {
+      return null;
+    }
+
+    // Check format MM/YY
+    if (!/^\d{2}\/\d{2}$/.test(value)) {
+      return { invalidFormat: true };
+    }
+
+    const [month, year] = value.split('/').map(Number);
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear() % 100; // Get last 2 digits
+    const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+
+    // Check if month is valid (1-12)
+    if (month < 1 || month > 12) {
+      return { invalidMonth: true };
+    }
+
+    // Check if date is in the past
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+      return { expired: true };
+    }
+
+    return null;
+  };
+}
 
 interface BookingData {
   userid: string;
@@ -102,10 +137,7 @@ export class PaymentComponent implements OnInit {
         '',
         [Validators.required, Validators.pattern(/^[a-zA-Z\s]{3,50}$/)],
       ],
-      expiryDate: [
-        '',
-        [Validators.required, Validators.pattern(/^\d{2}\/\d{2}$/)],
-      ],
+      expiryDate: ['', [Validators.required, expiryDateValidator()]],
       cvv: ['', [Validators.required, Validators.pattern(/^\d{3,4}$/)]],
     });
 
