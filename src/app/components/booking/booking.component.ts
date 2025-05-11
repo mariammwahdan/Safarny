@@ -251,6 +251,7 @@ export class BookingComponent implements OnInit {
       'trips',
       this.tripId
     ) as DocumentReference<Trip>;
+
     const booking: Booking = {
       userid: uid,
       tripid: tripRef,

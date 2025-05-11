@@ -12,44 +12,176 @@
   <!-- Content container with z-index to appear above the overlay -->
   <div class="flex flex-col items-center relative z-10">
     <div class="pt-8 mb-4"></div>
-    <h1 class="text-4xl text-amber-300 font-bold mb-8">Payment</h1>
-  </div>
+    <h1 class="text-4xl text-amber-300 font-bold mb-8">Payment Details</h1>
 
-  <div class="flex flex-col md:flex-row justify-between w-full mb-8">
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">Trip ID</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.tripid }}
+    <!-- Loading State -->
+    <div *ngIf="!booking && !isRetryMode" class="w-full max-w-4xl text-center">
+      <mat-spinner diameter="48" class="mx-auto mb-4"></mat-spinner>
+      <p class="text-xl text-white">Loading booking details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!booking && isRetryMode" class="w-full max-w-4xl text-center">
+      <p class="text-xl text-red-400">
+        No booking found. Please try booking again.
+      </p>
+      <button
+        mat-raised-button
+        color="primary"
+        class="mt-4"
+        (click)="navigateToHome()"
+      >
+        Return to Home
+      </button>
+    </div>
+
+    <!-- Booking Summary -->
+    <div
+      *ngIf="booking"
+      class="w-full max-w-4xl bg-white/10 backdrop-blur-sm rounded-lg p-6 mb-8"
+    >
+      <h2 class="text-2xl text-amber-300 font-semibold mb-4">
+        Booking Summary
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <div class="text-gray-300 text-sm uppercase">Trip ID</div>
+          <div class="text-xl text-white font-semibold">
+            {{ booking.tripid }}
+          </div>
+        </div>
+        <div>
+          <div class="text-gray-300 text-sm uppercase">Total Price</div>
+          <div class="text-xl text-white font-semibold">
+            {{ booking.totalPrice | currency : "EGP" }}
+          </div>
+        </div>
+        <div>
+          <div class="text-gray-300 text-sm uppercase">Number of Seats</div>
+          <div class="text-xl text-white font-semibold">
+            {{ booking.numberOfSeats }}
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">totalPrice</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.totalPrice | currency: 'EGP' }}
+    <!-- Payment Form -->
+    <form
+      *ngIf="booking"
+      [formGroup]="paymentForm"
+      (ngSubmit)="onSubmit()"
+      class="w-full max-w-4xl"
+    >
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl text-amber-300 font-semibold">Card Details</h2>
+          <img [src]="cardImage" [alt]="cardType" class="h-12 object-contain" />
+        </div>
+
+        <div class="space-y-6">
+          <!-- Card Number -->
+          <mat-form-field class="w-full">
+            <mat-label>Card Number</mat-label>
+            <input
+              matInput
+              formControlName="cardNumber"
+              (input)="formatCardNumber($event)"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+            />
+            <mat-error
+              *ngIf="paymentForm.get('cardNumber')?.hasError('required')"
+            >
+              Card number is required
+            </mat-error>
+            <mat-error
+              *ngIf="paymentForm.get('cardNumber')?.hasError('pattern')"
+            >
+              Please enter a valid card number
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Card Holder Name -->
+          <mat-form-field class="w-full">
+            <mat-label>Card Holder Name</mat-label>
+            <input
+              matInput
+              formControlName="cardHolderName"
+              placeholder="JOHN DOE"
+            />
+            <mat-error
+              *ngIf="paymentForm.get('cardHolderName')?.hasError('required')"
+            >
+              Card holder name is required
+            </mat-error>
+            <mat-error
+              *ngIf="paymentForm.get('cardHolderName')?.hasError('pattern')"
+            >
+              Please enter a valid name
+            </mat-error>
+          </mat-form-field>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Expiry Date -->
+            <mat-form-field>
+              <mat-label>Expiry Date</mat-label>
+              <input
+                matInput
+                formControlName="expiryDate"
+                (input)="formatExpiryDate($event)"
+                placeholder="MM/YY"
+                maxlength="5"
+              />
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('required')"
+              >
+                Expiry date is required
+              </mat-error>
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('pattern')"
+              >
+                Please enter a valid expiry date
+              </mat-error>
+            </mat-form-field>
+
+            <!-- CVV -->
+            <mat-form-field>
+              <mat-label>CVV</mat-label>
+              <input
+                matInput
+                formControlName="cvv"
+                type="password"
+                maxlength="4"
+                placeholder="123"
+              />
+              <mat-error *ngIf="paymentForm.get('cvv')?.hasError('required')">
+                CVV is required
+              </mat-error>
+              <mat-error *ngIf="paymentForm.get('cvv')?.hasError('pattern')">
+                Please enter a valid CVV
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="paymentForm.invalid || isProcessing"
+            class="px-8 py-3 text-lg font-semibold bg-amber-400 text-black hover:bg-amber-300 transition-colors"
+          >
+            <mat-spinner
+              *ngIf="isProcessing"
+              diameter="24"
+              class="mr-2"
+            ></mat-spinner>
+            {{ isProcessing ? "Processing..." : "Pay Now" }}
+          </button>
+        </div>
       </div>
-    </div>  
-
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">Number of Seats</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.numberOfSeats }}
-      </div>
-    </div>  
-    
-
-
-
+    </form>
   </div>
 </mat-card>
-    <!-- const plainBooking = { -->
-      <!-- userid: booking.userid, -->
-      <!-- tripid: booking.tripid.id, -->
-      <!-- numberOfSeats: booking.numberOfSeats, -->
-      <!-- selectedExtras: booking.selectedExtras.map((extra) => ({ -->
-        <!-- extrasId: extra.extrasId.id, -->
-        <!-- quantity: extra.quantity, -->
-      <!-- })), -->
-      <!-- selectedSeats: booking.selectedSeats, -->
-      <!-- totalPrice: booking.totalPrice, -->
-    <!-- }; -->
