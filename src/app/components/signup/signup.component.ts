@@ -90,9 +90,10 @@ export class SignupComponent {
         birthDate: this.signupForm.value.birthdate || undefined,
         password: this.signupForm.value.password || '',
         confirmPassword: this.signupForm.value.confirmPassword || undefined,
+        role: this.signupForm.value.email?.endsWith('@safarny.com') ? 'admin' : 'user'
       };
       try {
-        await this.firebaseAuth.signup(user); // ✅ Send to Firebase
+        await this.firebaseAuth.signup(user);
         console.log('Signup successful!');
         this.onClose();
       } catch (err: any) {

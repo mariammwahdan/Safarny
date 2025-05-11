@@ -1,0 +1,108 @@
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-blue-600 text-white flex flex-col">
+      <div class="p-6">
+        <h2 class="text-2xl font-bold">Safarny Admin</h2>
+        <div class="mt-6 flex items-center">
+          <img
+            src="https://img.freepik.com/premium-vector/cute-woman-avatar-profile-vector-illustration_1058532-14592.jpg"
+            alt="Admin Avatar"
+            class="w-12 h-12 rounded-full"
+          />
+          <span class="ml-4">{{ username }}</span>
+        </div>
+        <div class="mt-4">
+          <a (click)="logout()" class="block w-full text-center py-2.5 px-4 text-white font-bold border border-white rounded-full hover:bg-red-600 hover:border-red-600 transition-colors duration-300">Sign out</a>
+        </div>
+      </div>
+  
+      <nav class="mt-8 flex-1">
+        <ul>
+          <li
+            (click)="selectMenu('users')"
+            [ngClass]="
+              selectedMenu === 'users'
+                ? 'bg-white text-blue-600'
+                : 'hover:bg-blue-500'
+            "
+            class="px-6 py-3 cursor-pointer"
+          >
+            Manage Users
+          </li>
+          <li
+            (click)="selectMenu('bookings')"
+            [ngClass]="
+              selectedMenu === 'bookings'
+                ? 'bg-white text-blue-600'
+                : 'hover:bg-blue-500'
+            "
+            class="px-6 py-3 cursor-pointer"
+          >
+            Manage Booking
+          </li>
+        </ul>
+      </nav>
+    </aside>
+  
+    <!-- Main content -->
+    <main class="flex-1 bg-gray-100 p-8 overflow-auto">
+      <!-- Users view -->
+      <div *ngIf="selectedMenu === 'users'">
+        <h1 class="text-3xl font-semibold mb-4">
+          Manage Users
+        </h1>
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white shadow rounded-lg">
+            <thead>
+              <tr class="bg-gray-200 text-left">
+                <th class="px-6 py-3">First Name</th>
+                <th class="px-6 py-3">Last Name</th>
+                <th class="px-6 py-3">Email</th>
+                <th class="px-6 py-3">Phone</th>
+                <th class="px-6 py-3 text-center w-24">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let user of users"
+                class="border-b hover:bg-gray-50"
+              >
+                <td class="px-6 py-4">{{ user.firstname }}</td>
+                <td class="px-6 py-4">{{ user.lastname }}</td>
+                <td class="px-6 py-4">{{ user.email }}</td>
+                <td class="px-6 py-4">{{ user.phone }}</td>
+                <td class="px-6 py-4 w-24">
+                  <div class="flex justify-center space-x-4">
+                    <div class="settings-icon cursor-pointer" (click)="openEditDialog(user)">
+                      <mat-icon>settings</mat-icon>
+                    </div>
+                    <div class="settings-icon cursor-pointer" (click)="selectUser(user)">
+                      <mat-icon>event</mat-icon>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  
+      <!-- Bookings view -->
+      <div *ngIf="selectedMenu === 'bookings'">
+        <h1 class="text-3xl font-semibold mb-4">
+          Manage Booking
+        </h1>
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div *ngIf="!selectedUser" class="text-center">
+            <p class="text-lg text-gray-600 mb-4">Please select a user from the Manage Users section first</p>
+            <button (click)="selectMenu('users')" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition-colors duration-300">
+              Go to Manage Users
+            </button>
+          </div>
+          <div *ngIf="selectedUser" class="space-y-4">
+            <h2 class="text-xl font-semibold">Bookings for {{ selectedUser.firstname }} {{ selectedUser.lastname }}</h2>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
