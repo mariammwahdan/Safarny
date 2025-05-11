@@ -1,0 +1,90 @@
+<!-- Seat Selection Card -->
+<mat-card
+  class="p-6 shadow-2xl rounded-2xl relative overflow-hidden border border-amber-300"
+  style="
+    background-image: url('seats-background.jpg');
+    background-size: cover;
+    background-position: center;
+  "
+>
+  <!-- Overlay -->
+  <div class="absolute inset-0 bg-black/70"></div>
+
+  <!-- Foreground content -->
+  <div class="relative z-10">
+
+    <!-- Front Label -->
+    <div class="text-center text-amber-400 text-xl font-bold mb-4">🚍 FRONT</div>
+
+    <h2 class="text-4xl font-extrabold text-amber-300 text-center mb-6 drop-shadow-lg">
+      Select Your Seats
+    </h2>
+
+    <!-- Seats grid -->
+    <div class="seat-container grid gap-6 px-4 py-6 rounded-xl backdrop-blur-md bg-white/10 border border-amber-200 shadow-inner">
+
+      <div
+        class="flex items-center justify-center gap-8"
+        *ngFor="let row of ['A', 'B', 'C', 'D', 'E']"
+      >
+        <!-- Window label (left) -->
+        <div class="w-6 text-amber-200 font-bold text-sm rotate-[-90deg] hidden sm:block">
+          Window
+        </div>
+
+        <!-- Left seats -->
+        <div class="flex gap-3">
+          <div
+            *ngFor="let i of [1, 2]"
+            (click)="seatClicked(row + i)"
+            class="w-14 h-14 cursor-pointer flex items-center justify-center rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+            [ngClass]="{
+              'bg-amber-400 text-black shadow-lg': isSelected(row + i),
+              'bg-white/20 text-white border border-amber-200 hover:bg-amber-300 hover:text-black': !isSelected(row + i)
+            }"
+          >
+            {{ row + i }}
+          </div>
+        </div>
+
+        <!-- Aisle -->
+        <div class="w-12 h-1 bg-amber-300 rounded-full"></div>
+
+        <!-- Right seats -->
+        <div class="flex gap-3">
+          <div
+            *ngFor="let i of [3, 4]"
+            (click)="seatClicked(row + i)"
+            class="w-14 h-14 cursor-pointer flex items-center justify-center rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 hover:shadow-xl"
+            [ngClass]="{
+              'bg-amber-400 text-black shadow-lg': isSelected(row + i),
+              'bg-white/20 text-white border border-amber-200 hover:bg-amber-300 hover:text-black': !isSelected(row + i)
+            }"
+          >
+            {{ row + i }}
+          </div>
+        </div>
+
+        <!-- Window label (right) -->
+        <div class="w-6 text-amber-200 font-bold text-sm rotate-[90deg] hidden sm:block">
+          Window
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Label -->
+    <div class="text-center text-amber-400 text-lg font-bold mt-6">BACK 🚍</div>
+
+    <!-- Confirm Button -->
+    <div class="text-center mt-8">
+      <button
+        mat-raised-button
+        color="primary"
+        class="bg-amber-500 hover:bg-amber-400 text-black px-6 py-3 rounded-lg text-lg font-semibold shadow-lg transition duration-300"
+        (click)="confirmSelection()"
+      >
+        Accept
+      </button>
+    </div>
+  </div>
+</mat-card>

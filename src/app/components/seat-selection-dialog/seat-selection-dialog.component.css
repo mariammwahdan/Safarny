@@ -1,0 +1,32 @@
+.seat-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.seat div {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background-color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.seat div.selected {
+  background-color: #4caf50;
+  color: white;
+}
+
+.aisle {
+  width: 40px;
+}
