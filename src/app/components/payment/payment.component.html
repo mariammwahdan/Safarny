@@ -91,7 +91,7 @@
           <div>
             <div class="text-gray-300 text-sm uppercase">Date</div>
             <div class="text-xl text-white">
-              {{ trip?.departureDate | date : "mediumDate" }}
+              {{ trip.departureDate | date : "mediumDate" }}
             </div>
           </div>
         </div>
@@ -145,7 +145,7 @@
                 >Base Price ({{ booking?.numberOfSeats || 0 }} seats)</span
               >
               <span class="text-white">{{
-                (trip?.price || 0) * (booking?.numberOfSeats || 0)
+                (trip.price || 0) * (booking?.numberOfSeats || 0)
                   | currency : "EGP"
               }}</span>
             </div>

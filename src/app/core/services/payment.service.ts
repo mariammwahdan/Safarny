@@ -103,7 +103,7 @@ export class PaymentService {
 
   async updateBookingStatus(
     bookingId: string,
-    status: 'success' | 'failed'
+    status: 'success' | 'failed' | 'refunded'
   ): Promise<void> {
     await updateDoc(doc(this.firestore, this.BOOKINGS_COLLECTION, bookingId), {
       status,

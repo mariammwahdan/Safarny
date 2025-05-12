@@ -13,6 +13,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 import { EditUserDialogComponent } from '../../shared/edit-user-dialog/edit-user-dialog.component';
 import { NotificationService } from '../../core/services/notification.service';
+import { PaymentService, BookingRecord } from '../../core/services/payment.service';
+import { TripService } from '../../core/services/trip.service';
+import { Trip } from '../../types/trips';
+import { doc, updateDoc } from '@angular/fire/firestore';
+import { Firestore } from '@angular/fire/firestore';
+import { RefundConfirmationDialogComponent } from '../../shared/refund-confirmation-dialog/refund-confirmation-dialog.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -34,7 +40,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   showDropdown = false;
   users: User[] = [];
   selectedUser: User | null = null;
+  userBookings: BookingRecord[] = [];
+  tripDetails: Map<string, Trip> = new Map();
   displayedColumns: string[] = ['firstname', 'lastname', 'email', 'phone', 'actions'];
+  bookingColumns: string[] = ['source', 'destination', 'numberOfSeats', 'totalPrice', 'status', 'refund'];
 
   constructor(
     public _Nav: AuthService,
@@ -42,7 +51,10 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     private auth: Auth,
     private firebaseAuth: FirebaseAuthService,
     private dialog: MatDialog,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private paymentService: PaymentService,
+    private tripService: TripService,
+    private firestore: Firestore
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -121,9 +133,41 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectUser(user: User) {
+  async selectUser(user: User) {
     this.selectedUser = user;
     this.selectedMenu = 'bookings';
+    await this.loadUserBookings(user.uid!);
+  }
+
+  async loadUserBookings(userId: string) {
+    try {
+      this.userBookings = await this.paymentService.getUserBookings(userId);
+      // Load trip details for each booking
+      await this.loadTripDetails();
+    } catch (error) {
+      console.error('Error loading user bookings:', error);
+      this.notificationService.showError('Failed to load user bookings');
+    }
+  }
+
+  async loadTripDetails() {
+    try {
+      for (const booking of this.userBookings) {
+        if (!this.tripDetails.has(booking.tripid)) {
+          const trip = await this.tripService.getTripById(booking.tripid);
+          if (trip) {
+            this.tripDetails.set(booking.tripid, trip);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading trip details:', error);
+      this.notificationService.showError('Failed to load trip details');
+    }
+  }
+
+  getTripDetails(tripId: string): Trip | undefined {
+    return this.tripDetails.get(tripId);
   }
 
   selectMenu(menu: string) {
@@ -144,5 +188,37 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   goHome() {
     this.router.navigate(['/home']);
+  }
+
+  async refundBooking(booking: BookingRecord) {
+    const dialogRef = this.dialog.open(RefundConfirmationDialogComponent, {
+      width: '400px'
+    });
+
+    dialogRef.afterClosed().subscribe(async (result) => {
+      if (result) {
+        try {
+          // Update the booking status in Firestore
+          await updateDoc(doc(this.firestore, 'bookings', booking.id!), {
+            status: 'refunded',
+            updatedAt: new Date()
+          });
+          
+          // Update the local booking status
+          const index = this.userBookings.findIndex(b => b.id === booking.id);
+          if (index !== -1) {
+            this.userBookings[index] = {
+              ...this.userBookings[index],
+              status: 'refunded',
+              updatedAt: new Date()
+            };
+          }
+          this.notificationService.showRefundSuccess();
+        } catch (error) {
+          console.error('Error refunding booking:', error);
+          this.notificationService.showError('Failed to refund booking');
+        }
+      }
+    });
   }
 }
