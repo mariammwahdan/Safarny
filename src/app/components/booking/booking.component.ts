@@ -251,6 +251,7 @@ export class BookingComponent implements OnInit {
       'trips',
       this.tripId
     ) as DocumentReference<Trip>;
+
     const booking: Booking = {
       userid: uid,
       tripid: tripRef,
@@ -261,15 +262,17 @@ export class BookingComponent implements OnInit {
     };
 
     console.log('Booking details:', booking);
-    alert('Booking confirmed! 🎉');
 
     const plainBooking = {
       userid: booking.userid,
       tripid: booking.tripid.id,
       numberOfSeats: booking.numberOfSeats,
       selectedExtras: booking.selectedExtras.map((extra) => ({
-        extrasId: extra.extrasId.id,
+        extrasId: extra.extrasId,
         quantity: extra.quantity,
+        price: this.tripExtras.find(
+          (e) => e.extrasId === String(extra.extrasId)
+        )?.extrasPrice,
       })),
       selectedSeats: booking.selectedSeats,
       totalPrice: booking.totalPrice,
