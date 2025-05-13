@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
+import { CommonModule, Location } from '@angular/common';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -101,20 +101,21 @@ interface BookingData {
     MatIconModule,
   ],
 })
-export class PaymentComponent implements OnInit {
+export class PaymentComponent {
   booking: BookingData | null = null;
   trip: Trip | null = null;
   paymentForm: FormGroup;
   cardType: CardType = 'Unknown';
   cardImage: string = getCardImage('Unknown');
   isProcessing: boolean = false;
-  isRetryMode: boolean = false;
+  displayDetails: boolean = false;
   bookingId: string | null = null;
   isLoading: boolean = true;
   isPaymentSuccessful: boolean = false;
   maskedCardNumber: string = '';
   cardHolderName: string = '';
   tripExtrasIdNameMap: Map<string, string> = new Map();
+  tripExtrasIdPriceMap: Map<string, number> = new Map();
   private navigationState: any;
 
   constructor(
@@ -126,7 +127,8 @@ export class PaymentComponent implements OnInit {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private ref: ChangeDetectorRef,
-    private extrasService: TripExtrasService
+    private extrasService: TripExtrasService,
+    private _location: Location
   ) {
     this.paymentForm = this.fb.group({
       cardNumber: [
@@ -142,78 +144,32 @@ export class PaymentComponent implements OnInit {
     });
 
     // Get navigation state in constructor
-    const navigation = this.router.getCurrentNavigation();
-    if (navigation?.extras?.state) {
-      this.navigationState = navigation.extras.state;
-    }
-  }
-
-  async ngOnInit() {
-    this.isLoading = true;
-    this.bookingId = this.route.snapshot.paramMap.get('id');
-    this.isRetryMode = !!this.bookingId;
-
-    try {
-      if (this.isRetryMode) {
-        await this.loadBookingDetails();
+    this.route.paramMap.subscribe((params) => {
+      const navigation = this.router.getCurrentNavigation();
+      const id = params.get('id');
+      this.bookingId = id;
+      if (!navigation?.extras?.state && !id) {
+        // Go back in history to retrieve the booking data from the navigation state
+        this._location.back();
       } else {
-        const bookingData = this.navigationState?.['booking'] as BookingData;
-        console.log('Booking data:', bookingData);
-
-        if (!bookingData) {
-          console.error('No booking data found in state');
-          this.showError('No booking data found. Please try booking again.');
-          return;
+        this.navigationState = navigation?.extras.state;
+        if (!!id) {
+          this.displayDetails = true;
+          this.loadBookingDetails().finally(() => {
+            this.isLoading = false;
+          });
+        } else {
+          this.loadOtherModes().finally(() => {
+            this.isLoading = false;
+          });
         }
-
-        // Validate required booking data
-        if (
-          !bookingData.tripid ||
-          !bookingData.userid ||
-          !bookingData.totalPrice
-        ) {
-          console.error('Invalid booking data:', bookingData);
-          this.showError('Invalid booking data. Please try booking again.');
-          return;
-        }
-
-        this.booking = bookingData;
-        await this.loadTripDetails();
+        this.paymentForm.get('cardNumber')?.valueChanges.subscribe((value) => {
+          const cardType = getCardType(value);
+          this.cardType = cardType;
+          this.cardImage = getCardImage(cardType);
+        });
       }
-    } catch (error) {
-      console.error('Error in ngOnInit:', error);
-      this.showError('An error occurred while loading booking details.');
-    } finally {
-      this.isLoading = false;
-    }
-
-    this.paymentForm.get('cardNumber')?.valueChanges.subscribe((value) => {
-      const cardType = getCardType(value);
-      this.cardType = cardType;
-      this.cardImage = getCardImage(cardType);
     });
-    this.ref.detectChanges();
-  }
-
-  async loadTripDetails() {
-    if (!this.booking?.tripid) {
-      console.error('No trip ID found in booking');
-      return;
-    }
-
-    try {
-      this.trip = await this.tripService.getTripById(this.booking.tripid);
-      if (this.trip?.departureDate instanceof Timestamp) {
-        this.trip.departureDate = this.trip.departureDate.toDate();
-      }
-    } catch (error) {
-      console.error('Error loading trip details:', error);
-      this.showError('Error loading trip details. Please try again.');
-    }
-    const extras = await this.extrasService.getAllExtras();
-    this.tripExtrasIdNameMap = new Map(
-      extras.map((extra) => [extra.extrasId, extra.extrasName])
-    );
   }
 
   async loadBookingDetails() {
@@ -268,6 +224,46 @@ export class PaymentComponent implements OnInit {
     }
   }
 
+  async loadOtherModes() {
+    const bookingData = this.navigationState?.['booking'] as BookingData;
+    if (!bookingData) {
+      console.error('No booking data found in state');
+      this.showError('No booking data found. Please try booking again.');
+      return;
+    }
+    if (!bookingData.tripid || !bookingData.userid || !bookingData.totalPrice) {
+      console.error('Invalid booking data:', bookingData);
+      this.showError('Invalid booking data. Please try booking again.');
+      return;
+    }
+    this.booking = bookingData;
+    await this.loadTripDetails();
+  }
+
+  async loadTripDetails() {
+    if (!this.booking?.tripid) {
+      console.error('No trip ID found in booking');
+      return;
+    }
+
+    try {
+      this.trip = await this.tripService.getTripById(this.booking.tripid);
+      if (this.trip?.departureDate instanceof Timestamp) {
+        this.trip.departureDate = this.trip.departureDate.toDate();
+      }
+    } catch (error) {
+      console.error('Error loading trip details:', error);
+      this.showError('Error loading trip details. Please try again.');
+    }
+    const extras = await this.extrasService.getAllExtras();
+    this.tripExtrasIdNameMap = new Map(
+      extras.map((extra) => [extra.extrasId, extra.extrasName])
+    );
+    this.tripExtrasIdPriceMap = new Map(
+      extras.map((extra) => [extra.extrasId, extra.extrasPrice])
+    );
+  }
+
   private getExtraName(extrasId: string): string {
     // This should be replaced with actual extra name lookup from your service
     return 'Extra Service';
@@ -306,34 +302,28 @@ export class PaymentComponent implements OnInit {
       this.showError('No booking data found. Please try booking again.');
       return;
     }
-
     if (this.paymentForm.invalid) {
       this.showError('Please fill in all fields correctly');
       return;
     }
-
     this.isProcessing = true;
-
     try {
       const otp = await this.showOtpDialog();
       const isValidOtp = await this.paymentService.verifyOTP(otp || '');
-
       if (!isValidOtp) {
         this.showError('Invalid OTP. Please try again.');
         return;
       }
-
       const paymentDetails: PaymentDetails = this.paymentForm.value;
       let success: boolean;
-
-      if (this.isRetryMode && this.bookingId) {
+      if (this.displayDetails && this.bookingId) {
         success = await this.paymentService.retryPayment(
           this.bookingId,
           paymentDetails
         );
         if (success) {
           this.showSuccessMessage();
-          this.router.navigate(['/payment', this.bookingId]);
+          window.location.reload();
         } else {
           this.showError('Payment failed.');
         }
@@ -346,7 +336,10 @@ export class PaymentComponent implements OnInit {
         this.bookingId = result.bookingId;
         if (success) {
           this.showSuccessMessage();
-          this.router.navigate(['/payment', this.bookingId]);
+          this.router.navigate(['/']);
+          this.router.navigate(['/payment', result.bookingId], {
+            replaceUrl: true,
+          });
         } else {
           this.showError('Payment failed.');
         }

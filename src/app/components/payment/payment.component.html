@@ -111,7 +111,7 @@
               <span class="text-xl font-semibold">{{
                 booking?.numberOfSeats
               }}</span>
-              <span class="text-gray-400 ml-2"
+              <span class="text-amber-200 ml-2"
                 >seat{{ booking?.numberOfSeats !== 1 ? "s" : "" }}</span
               >
               <div *ngIf="booking?.selectedSeats?.length" class="mt-2 text-sm">
@@ -142,7 +142,9 @@
           <div class="mt-6 pt-6 border-t border-white/20">
             <div class="flex justify-between items-center">
               <span class="text-gray-300"
-                >Base Price ({{ booking?.numberOfSeats || 0 }} seats)</span
+                >Base Price ({{ booking?.numberOfSeats || 0 }} seat{{
+                  booking?.numberOfSeats !== 1 ? "s" : ""
+                }})</span
               >
               <span class="text-white">{{
                 (trip.price || 0) * (booking?.numberOfSeats || 0)
@@ -155,15 +157,15 @@
                 *ngFor="let extra of booking?.selectedExtras"
                 class="flex justify-between items-center text-sm"
               >
-                <span class="text-gray-400"
+                <span class="text-amber-200"
                   >{{
                     tripExtrasIdNameMap.get(extra.extrasId) || "Extra Service"
                   }}
                   x{{ extra?.quantity || 0 }}</span
                 >
                 <span class="text-white">{{
-                  (extra?.price || 0) * (extra?.quantity || 0)
-                    | currency : "EGP"
+                  (tripExtrasIdPriceMap.get(extra.extrasId) || 0) *
+                    (extra?.quantity || 0) | currency : "EGP"
                 }}</span>
               </div>
             </div>
