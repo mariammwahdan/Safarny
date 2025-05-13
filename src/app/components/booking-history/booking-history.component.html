@@ -1,14 +1,42 @@
-<div class="booking-history">
-  <h2 class="title">Booking History</h2>
+<h2 class="title">Booking History</h2>
 
-  <div *ngFor="let booking of bookings" class="booking-card">
-    <div class="item">{{ booking.date }}</div>
-    <div class="item status" [ngClass]="booking.status.toLowerCase()">
-      {{ booking.status }}
+<div *ngIf="isLoading" class="loading">Loading...</div>
+
+<div *ngIf="!isLoading && bookings.length === 0" class="no-data">
+  No bookings found.
+</div>
+
+<div *ngIf="!isLoading && bookings.length > 0" class="booking-container">
+  <div *ngFor="let record of bookings" class="booking-card">
+    <div class="booking-grid">
+      <div class="booking-item">
+        <span class="label">Date:</span>
+        <span>{{ record.trip.departureDateString }}</span>
+      </div>
+      <div class="booking-item">
+        <span class="label">Price:</span>
+        <span>{{ record.trip.price | currency: 'USD' }}</span>
+      </div>
+      <div class="booking-item">
+        <span class="label">Departure Time:</span>
+        <span>{{ record.trip.departureTime }}</span>
+      </div>
+      <div class="booking-item">
+        <span class="label">From:</span>
+        <span>{{ record.trip.source }}</span>
+      </div>
+      <div class="booking-item arrow">→</div>
+      <div class="booking-item">
+        <span class="label">To:</span>
+        <span>{{ record.trip.destination }}</span>
+      </div>
+      <div class="booking-item">
+        <span class="label">Arrival Time:</span>
+        <span>{{ record.trip.arrivalTime }}</span>
+      </div>
+      <div class="booking-item">
+        <span class="label">By:</span>
+        <span>{{ record.trip.transportationType}}</span>
     </div>
-    <div class="item">{{ booking.time }}</div>
-    <div class="item">{{ booking.from }}</div>
-    <div class="item arrow">→</div>
-    <div class="item">{{ booking.to }}</div>
   </div>
 </div>
