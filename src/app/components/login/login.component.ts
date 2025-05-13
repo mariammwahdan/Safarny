@@ -58,7 +58,7 @@ export class LoginComponent {
         const userCredential = await this.authService.login(this.loginForm.value);
         const userData = await this.firebaseAuth.getUserData(userCredential.user.uid);
         
-        localStorage.setItem('userRole', userData?.role || 'user');
+        localStorage.setItem('role', userData?.role || 'user');
         
         if (userData?.role === 'admin') {
           console.log('Admin login successful!');

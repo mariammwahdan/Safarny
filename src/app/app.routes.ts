@@ -7,6 +7,7 @@ import { ContactUsComponent } from './components/contact-us/contact-us.component
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { PaymentComponent } from './components/payment/payment.component';
+import { AdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -15,7 +16,7 @@ export const routes: Routes = [
   { path: 'profile', component: UserProfileComponent },
   { path: 'booking/:id', component: BookingComponent },
   { path: 'contact-us', component: ContactUsComponent },
-  { path: 'dashboard', component: AdminDashboardComponent },
+  { path: 'dashboard', component: AdminDashboardComponent, canActivate: [AdminGuard] },
   { path: 'about-us', component: AboutUsComponent },
   { path: 'payment', component: PaymentComponent },
   { path: 'payment/:id', component: PaymentComponent },
