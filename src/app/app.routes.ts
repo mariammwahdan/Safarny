@@ -8,16 +8,16 @@ import { AdminDashboardComponent } from './components/admin-dashboard/admin-dash
 import { AboutUsComponent } from './components/about-us/about-us.component';
 import { PaymentComponent } from './components/payment/payment.component';
 
-
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'trips', component: TripsComponent },
-  {path:'profile',component: UserProfileComponent},
+  { path: 'profile', component: UserProfileComponent },
   { path: 'booking/:id', component: BookingComponent },
   { path: 'contact-us', component: ContactUsComponent },
   { path: 'dashboard', component: AdminDashboardComponent },
   { path: 'about-us', component: AboutUsComponent },
-  {path: 'payment', component: PaymentComponent},
+  { path: 'payment', component: PaymentComponent },
+  { path: 'payment/:id', component: PaymentComponent },
   { path: '**', redirectTo: 'home' },
 ];

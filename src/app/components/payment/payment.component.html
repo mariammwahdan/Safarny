@@ -12,44 +12,366 @@
   <!-- Content container with z-index to appear above the overlay -->
   <div class="flex flex-col items-center relative z-10">
     <div class="pt-8 mb-4"></div>
-    <h1 class="text-4xl text-amber-300 font-bold mb-8">Payment</h1>
-  </div>
+    <h1 class="text-4xl text-amber-300 font-bold mb-8">Payment Details</h1>
 
-  <div class="flex flex-col md:flex-row justify-between w-full mb-8">
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">Trip ID</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.tripid }}
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="w-full max-w-4xl text-center">
+      <mat-spinner diameter="48" class="mx-auto mb-4"></mat-spinner>
+      <p class="text-xl text-white">Loading booking details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!isLoading && !booking" class="w-full max-w-4xl text-center">
+      <p class="text-xl text-red-400">
+        No booking found. Please try booking again.
+      </p>
+      <button
+        mat-raised-button
+        color="primary"
+        class="mt-4"
+        (click)="navigateToHome()"
+      >
+        Return to Home
+      </button>
+    </div>
+
+    <!-- Trip Details Section - Show in all cases -->
+    <div *ngIf="!isLoading && trip" class="w-full max-w-4xl mb-8">
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8">
+        <h2 class="text-2xl text-amber-300 font-semibold mb-6">Trip Details</h2>
+
+        <!-- Route Information -->
+        <div
+          class="flex flex-col md:flex-row justify-between items-center mb-6"
+        >
+          <div class="flex-1 text-center md:text-left">
+            <div class="text-gray-300 text-sm uppercase">From</div>
+            <div class="text-2xl font-bold text-white">{{ trip.source }}</div>
+          </div>
+
+          <div class="flex items-center justify-center my-4 md:my-0">
+            <div class="flex items-center">
+              <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+              <div class="w-16 h-1 bg-amber-300"></div>
+              <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+              <span class="mx-2 text-amber-300 text-2xl">
+                <ng-container
+                  [ngSwitch]="trip.transportationType.toLowerCase()"
+                >
+                  <mat-icon *ngSwitchCase="'flight'">flight</mat-icon>
+                  <mat-icon *ngSwitchCase="'train'">train</mat-icon>
+                  <mat-icon *ngSwitchCase="'bus'">directions_bus</mat-icon>
+                  <mat-icon *ngSwitchDefault>commute</mat-icon>
+                </ng-container>
+              </span>
+              <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+              <div class="w-16 h-1 bg-amber-300"></div>
+              <div class="w-3 h-3 bg-amber-300 rounded-full"></div>
+            </div>
+          </div>
+
+          <div class="flex-1 text-center md:text-right">
+            <div class="text-gray-300 text-sm uppercase">To</div>
+            <div class="text-2xl font-bold text-white">
+              {{ trip.destination }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Trip Schedule -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-8">
+          <div>
+            <div class="text-gray-300 text-sm uppercase">Departure</div>
+            <div class="text-xl text-white">{{ trip.departureTime }}</div>
+          </div>
+          <div>
+            <div class="text-gray-300 text-sm uppercase">Arrival</div>
+            <div class="text-xl text-white">{{ trip.arrivalTime }}</div>
+          </div>
+          <div>
+            <div class="text-gray-300 text-sm uppercase">Date</div>
+            <div class="text-xl text-white">
+              {{ trip.departureDate | date : "mediumDate" }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Booking Summary -->
+        <div class="bg-white/20 rounded-lg p-6">
+          <h3 class="text-xl text-amber-300 font-semibold mb-4">
+            Booking Summary
+          </h3>
+
+          <!-- Seats Information -->
+          <div class="mb-6">
+            <div class="text-gray-300 text-sm uppercase mb-2">
+              Selected Seats
+            </div>
+            <div class="text-white">
+              <span class="text-xl font-semibold">{{
+                booking?.numberOfSeats
+              }}</span>
+              <span class="text-amber-200 ml-2"
+                >seat{{ booking?.numberOfSeats !== 1 ? "s" : "" }}</span
+              >
+              <div *ngIf="booking?.selectedSeats?.length" class="mt-2 text-sm">
+                Seat numbers: {{ booking?.selectedSeats?.join(", ") }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Extras Information -->
+          <div *ngIf="booking?.selectedExtras?.length">
+            <div class="text-gray-300 text-sm uppercase mb-2">
+              Selected Extras
+            </div>
+            <div class="space-y-2">
+              <div
+                *ngFor="let extra of booking?.selectedExtras"
+                class="flex justify-between items-center"
+              >
+                <span class="text-white">{{
+                  tripExtrasIdNameMap.get(extra.extrasId) || "Extra Service"
+                }}</span>
+                <span class="text-amber-300">x{{ extra?.quantity || 0 }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Price Breakdown -->
+          <div class="mt-6 pt-6 border-t border-white/20">
+            <div class="flex justify-between items-center">
+              <span class="text-gray-300"
+                >Base Price ({{ booking?.numberOfSeats || 0 }} seat{{
+                  booking?.numberOfSeats !== 1 ? "s" : ""
+                }})</span
+              >
+              <span class="text-white">{{
+                (trip.price || 0) * (booking?.numberOfSeats || 0)
+                  | currency : "EGP"
+              }}</span>
+            </div>
+            <div *ngIf="booking?.selectedExtras?.length" class="mt-2">
+              <div class="text-gray-300 text-sm mb-2">Extras</div>
+              <div
+                *ngFor="let extra of booking?.selectedExtras"
+                class="flex justify-between items-center text-sm"
+              >
+                <span class="text-amber-200"
+                  >{{
+                    tripExtrasIdNameMap.get(extra.extrasId) || "Extra Service"
+                  }}
+                  x{{ extra?.quantity || 0 }}</span
+                >
+                <span class="text-white">{{
+                  (tripExtrasIdPriceMap.get(extra.extrasId) || 0) *
+                    (extra?.quantity || 0) | currency : "EGP"
+                }}</span>
+              </div>
+            </div>
+            <div
+              class="flex justify-between items-center mt-4 pt-4 border-t border-white/20"
+            >
+              <span class="text-xl font-semibold text-white">Total Price</span>
+              <span class="text-2xl font-bold text-amber-300">{{
+                booking?.totalPrice || 0 | currency : "EGP"
+              }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">totalPrice</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.totalPrice | currency: 'EGP' }}
+    <!-- Success State -->
+    <div
+      *ngIf="!isLoading && booking && isPaymentSuccessful"
+      class="w-full max-w-4xl"
+    >
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8 mb-8">
+        <!-- Success Message -->
+        <div
+          *ngIf="booking.status === 'success'"
+          class="flex items-center justify-center mb-6"
+        >
+          <mat-icon class="text-6xl text-green-500 mr-4">check_circle</mat-icon>
+          <h2 class="text-3xl text-green-500 font-semibold">
+            Payment Successful!
+          </h2>
+        </div>
+
+        <!-- Refunded Status -->
+        <div
+          *ngIf="booking.status === 'refunded'"
+          class="flex items-center justify-center mb-6"
+        >
+          <mat-icon class="text-6xl text-amber-400 mr-4"
+            >currency_exchange</mat-icon
+          >
+          <div>
+            <h2 class="text-3xl text-amber-400 font-semibold">
+              Payment Refunded
+            </h2>
+            <p class="text-gray-300 mt-2">
+              This payment has been refunded to your account
+            </p>
+          </div>
+        </div>
+
+        <!-- Card Details -->
+        <div class="bg-white/20 rounded-lg p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl text-amber-300 font-semibold">
+              Payment Details
+            </h3>
+            <img
+              [src]="cardImage"
+              [alt]="cardType"
+              class="h-12 object-contain"
+            />
+          </div>
+          <div class="space-y-4">
+            <div>
+              <div class="text-gray-300 text-sm uppercase">Card Number</div>
+              <div class="text-2xl text-white font-mono">
+                {{ maskedCardNumber }}
+              </div>
+            </div>
+            <div>
+              <div class="text-gray-300 text-sm uppercase">Card Holder</div>
+              <div class="text-xl text-white">{{ cardHolderName }}</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>  
+    </div>
 
-    <div class="flex-1 mb-4 md:mb-0">
-      <div class="text-base text-gray-300 uppercase font-medium">Number of Seats</div>
-      <div class="text-3xl font-bold text-orange-300">
-        {{ booking.numberOfSeats }}
+    <!-- Payment Form -->
+    <form
+      *ngIf="!isLoading && booking && !isPaymentSuccessful"
+      [formGroup]="paymentForm"
+      (ngSubmit)="onSubmit()"
+      class="w-full max-w-4xl"
+    >
+      <div class="bg-white/10 backdrop-blur-sm rounded-lg p-8">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl text-amber-300 font-semibold">Card Details</h2>
+          <img [src]="cardImage" [alt]="cardType" class="h-12 object-contain" />
+        </div>
+
+        <div class="space-y-6">
+          <!-- Card Number -->
+          <mat-form-field class="w-full">
+            <mat-label>Card Number</mat-label>
+            <input
+              matInput
+              formControlName="cardNumber"
+              (input)="formatCardNumber($event)"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+            />
+            <mat-error
+              *ngIf="paymentForm.get('cardNumber')?.hasError('required')"
+            >
+              Card number is required
+            </mat-error>
+            <mat-error
+              *ngIf="paymentForm.get('cardNumber')?.hasError('pattern')"
+            >
+              Please enter a valid card number
+            </mat-error>
+          </mat-form-field>
+
+          <!-- Card Holder Name -->
+          <mat-form-field class="w-full">
+            <mat-label>Card Holder Name</mat-label>
+            <input
+              matInput
+              formControlName="cardHolderName"
+              placeholder="JOHN DOE"
+            />
+            <mat-error
+              *ngIf="paymentForm.get('cardHolderName')?.hasError('required')"
+            >
+              Card holder name is required
+            </mat-error>
+            <mat-error
+              *ngIf="paymentForm.get('cardHolderName')?.hasError('pattern')"
+            >
+              Please enter a valid name
+            </mat-error>
+          </mat-form-field>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Expiry Date -->
+            <mat-form-field>
+              <mat-label>Expiry Date</mat-label>
+              <input
+                matInput
+                formControlName="expiryDate"
+                (input)="formatExpiryDate($event)"
+                placeholder="MM/YY"
+                maxlength="5"
+              />
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('required')"
+              >
+                Expiry date is required
+              </mat-error>
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('invalidFormat')"
+              >
+                Please enter a valid date in MM/YY format
+              </mat-error>
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('invalidMonth')"
+              >
+                Month must be between 01 and 12
+              </mat-error>
+              <mat-error
+                *ngIf="paymentForm.get('expiryDate')?.hasError('expired')"
+              >
+                Card has expired
+              </mat-error>
+            </mat-form-field>
+
+            <!-- CVV -->
+            <mat-form-field>
+              <mat-label>CVV</mat-label>
+              <input
+                matInput
+                formControlName="cvv"
+                type="password"
+                maxlength="4"
+                placeholder="123"
+              />
+              <mat-error *ngIf="paymentForm.get('cvv')?.hasError('required')">
+                CVV is required
+              </mat-error>
+              <mat-error *ngIf="paymentForm.get('cvv')?.hasError('pattern')">
+                Please enter a valid CVV
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="mt-8 flex justify-end">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="paymentForm.invalid || isProcessing"
+            class="px-8 py-3 text-lg font-semibold bg-amber-400 text-black hover:bg-amber-300 transition-colors"
+          >
+            <mat-spinner
+              *ngIf="isProcessing"
+              diameter="24"
+              class="mr-2"
+            ></mat-spinner>
+            {{ isProcessing ? "Processing..." : "Pay Now" }}
+          </button>
+        </div>
       </div>
-    </div>  
-    
-
-
-
+    </form>
   </div>
 </mat-card>
-    <!-- const plainBooking = { -->
-      <!-- userid: booking.userid, -->
-      <!-- tripid: booking.tripid.id, -->
-      <!-- numberOfSeats: booking.numberOfSeats, -->
-      <!-- selectedExtras: booking.selectedExtras.map((extra) => ({ -->
-        <!-- extrasId: extra.extrasId.id, -->
-        <!-- quantity: extra.quantity, -->
-      <!-- })), -->
-      <!-- selectedSeats: booking.selectedSeats, -->
-      <!-- totalPrice: booking.totalPrice, -->
-    <!-- }; -->

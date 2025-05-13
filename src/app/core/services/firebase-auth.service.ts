@@ -2,10 +2,8 @@
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, UserCredential, signInWithEmailAndPassword,
   signOut } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc, query, where, DocumentReference } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc } from '@angular/fire/firestore';
 import { User } from '../../types/user';
-import { BookingWithTrip } from '../../types/booking';
-import { Trip } from '../../types/trips';
 
 @Injectable({
   providedIn: 'root'
@@ -103,43 +101,4 @@ export class FirebaseAuthService {
     const userDoc = doc(this.firestore, `users/${uid}`);
     await deleteDoc(userDoc);
   }
-  async getUserBookings(uid: string): Promise<BookingWithTrip[]> {
-  const bookingsCollection = collection(this.firestore, 'bookings');
-  const q = query(bookingsCollection, where('userid', '==', uid));
-  const bookingsSnapshot = await getDocs(q);
-
-  const bookings: BookingWithTrip[] = [];
-
-  for (const bookingDoc of bookingsSnapshot.docs) {
-    const bookingData = bookingDoc.data();
-
-const tripRef = doc(
-      this.firestore,
-      'trips',
-      bookingData['tripid']
-    ) as DocumentReference<Trip>;
-    const tripSnap = await getDoc(tripRef);
-
-    if (tripSnap.exists()) {
-      bookings.push({
-        bookingId: bookingDoc.id,
-        booking: {
-          userid: bookingData['userid'],
-          tripid: tripRef,
-          numberOfSeats: bookingData['numberOfSeats'],
-          selectedExtras: bookingData['selectedExtras'],
-          selectedSeats: bookingData['selectedSeats'],
-          totalPrice: bookingData['totalPrice'],
-
-        },
-        trip: tripSnap.data() as Trip,
-      });
-    }
-  }
-
-  return bookings;
 }
-
-}
-
-

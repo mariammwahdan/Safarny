@@ -1,24 +1,114 @@
-<div class="payments-wrapper"><main class="flex-1 p-6">
-  <h1 class="title">Payments</h1>
-  <div class="space-y-4">
-    <!-- Payment Card -->
-    <div class="p-4 border rounded shadow-sm bg-white">
-      <div class="flex justify-between items-center">
-        <div>
-          <p class="text-green-600 font-semibold">Paid on 22nd Apr, 05:45 PM</p>
-          <p class="text-sm text-gray-600">Booking #NEGH40057909337</p>
-          <p class="text-sm">Description: Booking of Aswan to Cairo Trip</p>
-        </div>
-        <div class="text-right">
-          <p class="font-bold text-lg">45.00</p>
-          <div class="mt-2">
-            <button class="text-blue-600 mr-2">View Invoice</button>
-            <button class="text-blue-600">Refund</button>
+<div class="payments-wrapper">
+  <main class="flex-1 p-6">
+    <h1 class="text-3xl font-bold mb-6">Payment History</h1>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-8">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+
+    <!-- No Payments State -->
+    <div *ngIf="!isLoading && payments.length === 0" class="text-center py-8">
+      <p class="text-gray-600 text-lg">No payment history found.</p>
+    </div>
+
+    <!-- Payments List -->
+    <div *ngIf="!isLoading && payments.length > 0" class="space-y-4">
+      <!-- Payment Card -->
+      <div
+        *ngFor="let payment of payments"
+        class="p-6 border rounded-lg shadow-sm bg-white"
+      >
+        <div class="flex justify-between items-start">
+          <div class="space-y-2">
+            <!-- Status and Date -->
+            <div class="flex items-center space-x-2">
+              <span
+                [class]="getStatusColor(payment.booking.status)"
+                class="font-semibold flex items-center"
+              >
+                <mat-icon class="text-sm mr-1">{{
+                  getStatusIcon(payment.booking.status)
+                }}</mat-icon>
+                {{ getStatusText(payment.booking.status) }}
+              </span>
+              <span class="text-gray-500">•</span>
+              <span class="text-gray-600"
+                >Paid on {{ formatPaymentDate(payment.booking) }}</span
+              >
+            </div>
+
+            <!-- Booking Details -->
+            <div>
+              <p class="text-sm text-gray-600">
+                Booking #{{ payment.booking.id }}
+              </p>
+              <p class="text-sm" *ngIf="payment.trip">
+                {{ payment.trip.source }} to {{ payment.trip.destination }}
+              </p>
+              <p class="text-sm text-gray-600">
+                {{ payment.booking.numberOfSeats }} seat{{
+                  payment.booking.numberOfSeats > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+
+            <!-- Payment Details -->
+            <div *ngIf="payment.booking.paymentDetails" class="mt-2">
+              <p class="text-sm text-gray-600">
+                Paid with {{ payment.booking.paymentDetails.cardHolderName }}'s
+                card ending in
+                {{ payment.booking.paymentDetails.cardNumber.slice(-4) }}
+              </p>
+              <!-- Refund Information -->
+              <p
+                *ngIf="payment.booking.status === 'refunded'"
+                class="text-sm text-purple-600 mt-1"
+              >
+                <mat-icon class="text-sm align-middle mr-1">replay</mat-icon>
+                Refunded on {{ formatRefundDate(payment.booking) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <p
+              class="font-bold text-xl"
+              [ngClass]="{
+                'text-gray-900': payment.booking.status !== 'refunded',
+                'text-purple-600': payment.booking.status === 'refunded'
+              }"
+            >
+              {{ payment.booking.totalPrice | currency : "EGP" }}
+            </p>
+            <div class="mt-4 space-x-2">
+              <!-- Retry Payment Button -->
+              <button
+                *ngIf="payment.booking.status === 'failed'"
+                mat-button
+                color="primary"
+                [routerLink]="['/payment', payment.booking.id]"
+                class="text-blue-600"
+              >
+                <mat-icon class="mr-1">refresh</mat-icon>
+                Retry Payment
+              </button>
+
+              <!-- View Details Button -->
+              <button
+                *ngIf="payment.booking.status !== 'failed'"
+                mat-button
+                color="primary"
+                [routerLink]="['/payment', payment.booking.id]"
+                class="text-blue-600"
+              >
+                <mat-icon class="mr-1">receipt</mat-icon>
+                View Details
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Repeat cards for more payments -->
-  </div>
-</main>
+  </main>
 </div>

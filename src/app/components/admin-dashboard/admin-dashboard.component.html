@@ -22,10 +22,10 @@
             (click)="selectMenu('users')"
             [ngClass]="
               selectedMenu === 'users'
-                ? 'bg-white text-blue-600'
-                : 'hover:bg-blue-500'
+                ? 'bg-white text-blue-600 rounded-lg font-bold'
+                : 'hover:bg-blue-500/20 hover:rounded-lg transition-all duration-300'
             "
-            class="px-6 py-3 cursor-pointer"
+            class="px-6 py-3 cursor-pointer mx-2"
           >
             Manage Users
           </li>
@@ -33,12 +33,23 @@
             (click)="selectMenu('bookings')"
             [ngClass]="
               selectedMenu === 'bookings'
-                ? 'bg-white text-blue-600'
-                : 'hover:bg-blue-500'
+                ? 'bg-white text-blue-600 rounded-lg font-bold'
+                : 'hover:bg-blue-500/20 hover:rounded-lg transition-all duration-300'
             "
-            class="px-6 py-3 cursor-pointer"
+            class="px-6 py-3 cursor-pointer mx-2"
           >
             Manage Booking
+          </li>
+          <li
+            (click)="selectMenu('trips')"
+            [ngClass]="
+              selectedMenu === 'trips'
+                ? 'bg-white text-blue-600 rounded-lg font-bold'
+                : 'hover:bg-blue-500/20 hover:rounded-lg transition-all duration-300'
+            "
+            class="px-6 py-3 cursor-pointer mx-2"
+          >
+            Manage Trips
           </li>
         </ul>
       </nav>
@@ -101,7 +112,184 @@
           </div>
           <div *ngIf="selectedUser" class="space-y-4">
             <h2 class="text-xl font-semibold">Bookings for {{ selectedUser.firstname }} {{ selectedUser.lastname }}</h2>
+            
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white shadow rounded-lg">
+                <thead>
+                  <tr class="bg-gray-200 text-left">
+                    <th class="px-6 py-3">From</th>
+                    <th class="px-6 py-3">To</th>
+                    <th class="px-6 py-3">Seats</th>
+                    <th class="px-6 py-3">Total Price</th>
+                    <th class="px-6 py-3">Status</th>
+                    <th class="px-6 py-3 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let booking of userBookings" class="border-b hover:bg-gray-50">
+                    <td class="px-6 py-4">{{ getTripDetails(booking.tripid)?.source || 'Loading...' }}</td>
+                    <td class="px-6 py-4">{{ getTripDetails(booking.tripid)?.destination || 'Loading...' }}</td>
+                    <td class="px-6 py-4">{{ booking.numberOfSeats }}</td>
+                    <td class="px-6 py-4">${{ booking.totalPrice }}</td>
+                    <td class="px-6 py-4">
+                      <span [ngClass]="{
+                        'px-2 py-1 rounded-full text-sm': true,
+                        'bg-green-100 text-green-800': booking.status === 'success',
+                        'bg-yellow-100 text-yellow-800': booking.status === 'pending',
+                        'bg-red-100 text-red-800': booking.status === 'failed',
+                        'bg-blue-100 text-blue-800': booking.status === 'refunded'
+                      }">
+                        {{ booking.status | titlecase }}
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        [disabled]="booking.status !== 'success'"
+                        (click)="refundBooking(booking)"
+                        class="w-32 py-2 text-sm font-medium transition-all duration-200"
+                        [ngClass]="{
+                          'bg-blue-600 hover:bg-blue-700 text-white shadow-md': booking.status === 'success',
+                          'bg-gray-200 text-gray-400 cursor-not-allowed': booking.status !== 'success'
+                        }"
+                      >
+                        <span class="flex items-center justify-center">
+                          <mat-icon class="mr-1 text-lg">currency_exchange</mat-icon>
+                          Refund
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="userBookings.length === 0">
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                      No bookings found for this user
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Trips view -->
+      <div *ngIf="selectedMenu === 'trips'">
+        <h1 class="text-3xl font-semibold mb-4">
+          Manage Trips
+        </h1>
+        
+        <!-- Add Trip Form -->
+        <div class="bg-white p-6 rounded-lg shadow">
+          <h2 class="text-xl font-semibold mb-4">Add New Trip</h2>
+          <form [formGroup]="tripForm" (ngSubmit)="createTrip()" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Source City</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <mat-select formControlName="source" placeholder="e.g., Cairo">
+                  <mat-option *ngFor="let city of cities" [value]="city.value">
+                    {{city.name}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="tripForm.get('source')?.invalid">
+                  {{ getErrorMessage('source') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Destination City</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <mat-select formControlName="destination" placeholder="e.g., Alexandria">
+                  <mat-option *ngFor="let city of cities" [value]="city.value">
+                    {{city.name}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="tripForm.get('destination')?.invalid">
+                  {{ getErrorMessage('destination') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Departure Date</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <input matInput [matDatepicker]="picker" formControlName="departureDate" [min]="minDate" placeholder="e.g., 5/15/2025">
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+                <mat-error *ngIf="tripForm.get('departureDate')?.invalid">
+                  {{ getErrorMessage('departureDate') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Departure Time</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <input matInput formControlName="departureTime" placeholder="e.g., 14:30">
+                <mat-error *ngIf="tripForm.get('departureTime')?.invalid">
+                  {{ getErrorMessage('departureTime') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Arrival Time</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <input matInput formControlName="arrivalTime" placeholder="e.g., 16:45">
+                <mat-error *ngIf="tripForm.get('arrivalTime')?.invalid">
+                  {{ getErrorMessage('arrivalTime') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Trip Duration</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <input matInput formControlName="duration" placeholder="Calculated automatically" readonly>
+                <mat-error *ngIf="tripForm.get('duration')?.invalid">
+                  {{ getErrorMessage('duration') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Transportation Type</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <mat-select formControlName="transportationType" placeholder="e.g., Bus">
+                  <mat-option *ngFor="let type of transportationTypes" [value]="type">
+                    {{type}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="tripForm.get('transportationType')?.invalid">
+                  {{ getErrorMessage('transportationType') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="w-full">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+              <mat-form-field appearance="fill" class="w-full">
+                <input matInput type="number" formControlName="price" placeholder="e.g., 99.99">
+                <span matPrefix>$&nbsp;</span>
+                <mat-error *ngIf="tripForm.get('price')?.invalid">
+                  {{ getErrorMessage('price') }}
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="col-span-full flex justify-end">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="!tripForm.valid"
+                class="w-32"
+              >
+                Add Trip
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </main>
