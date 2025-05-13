@@ -16,6 +16,7 @@ export interface Trip {
   duration: string;
   transportationType: TransportationType;
   price: number;
+  departureDateString: String;
 }
 
 export enum TransportationType {

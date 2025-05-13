@@ -2,8 +2,10 @@
 import { Injectable } from '@angular/core';
 import { Auth, createUserWithEmailAndPassword, UserCredential, signInWithEmailAndPassword,
   signOut } from '@angular/fire/auth';
-import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, deleteDoc, DocumentReference, query, where } from '@angular/fire/firestore';
 import { User } from '../../types/user';
+import { Trip } from '../../types/trips';
+import { BookingWithTrip } from '../../types/booking';
 
 @Injectable({
   providedIn: 'root'
@@ -61,9 +63,9 @@ export class FirebaseAuthService {
       }
       return acc;
     }, {} as Record<string, any>);
-    
+
     await updateDoc(userRef, updateData);
-    
+
     const updatedUser = await this.getUserData(uid);
     if (updatedUser) {
       localStorage.setItem('user', JSON.stringify(updatedUser));
@@ -79,7 +81,7 @@ export class FirebaseAuthService {
     const usersCollection = collection(this.firestore, 'users');
     const usersSnapshot = await getDocs(usersCollection);
     const users: User[] = [];
-    
+
     usersSnapshot.forEach(doc => {
       const data = doc.data();
       users.push({
@@ -93,7 +95,7 @@ export class FirebaseAuthService {
         role: data['role'] || 'user'
       });
     });
-    
+
     return users;
   }
 
@@ -101,4 +103,43 @@ export class FirebaseAuthService {
     const userDoc = doc(this.firestore, `users/${uid}`);
     await deleteDoc(userDoc);
   }
+  async getUserBookings(uid: string): Promise<BookingWithTrip[]> {
+  const bookingsCollection = collection(this.firestore, 'bookings');
+  const q = query(bookingsCollection, where('userid', '==', uid));
+  const bookingsSnapshot = await getDocs(q);
+
+  const bookings: BookingWithTrip[] = [];
+
+  for (const bookingDoc of bookingsSnapshot.docs) {
+    const bookingData = bookingDoc.data();
+
+const tripRef = doc(
+      this.firestore,
+      'trips',
+      bookingData['tripid']
+    ) as DocumentReference<Trip>;
+    const tripSnap = await getDoc(tripRef);
+
+    if (tripSnap.exists()) {
+      bookings.push({
+        bookingId: bookingDoc.id,
+        booking: {
+          userid: bookingData['userid'],
+          tripid: tripRef,
+          numberOfSeats: bookingData['numberOfSeats'],
+          selectedExtras: bookingData['selectedExtras'],
+          selectedSeats: bookingData['selectedSeats'],
+          totalPrice: bookingData['totalPrice'],
+
+        },
+        trip: tripSnap.data() as Trip,
+      });
+    }
+  }
+
+  return bookings;
 }
+
+}
+
+
