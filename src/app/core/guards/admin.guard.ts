@@ -21,7 +21,6 @@ export class AdminGuard implements CanActivate {
       return true;
     }
 
-    // If not admin, redirect to home
     this.router.navigate(['/home']);
     return false;
   }
