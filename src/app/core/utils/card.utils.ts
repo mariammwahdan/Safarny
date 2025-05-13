@@ -3,19 +3,15 @@ export type CardType = 'Visa' | 'MasterCard' | 'Meeza' | 'Unknown';
 export function getCardType(cardNumber: string): CardType {
   const sanitized = cardNumber.replace(/\s|-/g, '');
 
-  if (/^4\d{12}(\d{3})?$/.test(sanitized)) {
+  if (sanitized.startsWith('4')) {
     return 'Visa';
   }
 
-  if (
-    /^(5[1-5]\d{14}|2(2[2-9]\d{12}|[3-6]\d{13}|7([01]\d{12}|20\d{12})))$/.test(
-      sanitized
-    )
-  ) {
+  if (sanitized.startsWith('5')) {
     return 'MasterCard';
   }
 
-  if (/^(5078|5079|5080|588845)\d{10}$/.test(sanitized)) {
+  if (sanitized.startsWith('6')) {
     return 'Meeza';
   }
 

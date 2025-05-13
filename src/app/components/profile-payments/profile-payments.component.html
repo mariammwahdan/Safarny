@@ -96,9 +96,10 @@
 
               <!-- View Details Button -->
               <button
-                *ngIf="payment.booking.status === 'success'"
+                *ngIf="payment.booking.status !== 'failed'"
                 mat-button
                 color="primary"
+                [routerLink]="['/payment', payment.booking.id]"
                 class="text-blue-600"
               >
                 <mat-icon class="mr-1">receipt</mat-icon>
