@@ -85,14 +85,14 @@
             <div class="text-xl text-white">{{ trip.departureTime }}</div>
           </div>
           <div>
-            <div class="text-gray-300 text-sm uppercase">Arrival</div>
-            <div class="text-xl text-white">{{ trip.arrivalTime }}</div>
-          </div>
-          <div>
             <div class="text-gray-300 text-sm uppercase">Date</div>
             <div class="text-xl text-white">
               {{ trip.departureDate | date : "mediumDate" }}
             </div>
+          </div>
+          <div>
+            <div class="text-gray-300 text-sm uppercase">Arrival</div>
+            <div class="text-xl text-white">{{ trip.arrivalTime }}</div>
           </div>
         </div>
 
