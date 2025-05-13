@@ -34,6 +34,15 @@ export class NotificationService {
     });
   }
 
+  showSuccess(message: string) {
+    this.snackBar.open(message, '', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['update-snackbar']
+    });
+  }
+
   showError(message: string) {
     this.snackBar.open(message, '', {
       duration: 3000,
